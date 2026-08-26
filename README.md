@@ -1,18 +1,18 @@
-#Full Stack -websovelluskehitys harjoitustyö
+# Full Stack -websovelluskehitys harjoitustyö
 
-##Työn aihe: liiketoimintaprosessien hallintatyökalu 
+## Työn aihe: liiketoimintaprosessien hallintatyökalu 
 
-##Kuvaus: Sovelluksen avulla voidaan rakentaa erilaisten tarpeisiin
+## Kuvaus: Sovelluksen avulla voidaan rakentaa erilaisten tarpeisiin
 mukautuva liiketoimintaprosessien hallintatyökalu.
 
-##Toiminnot:
+## Toiminnot:
 
 - Soveluksessa voi olla useita käyttäjiä.
 - Sovellukseen voi luoda prosesseja. Prosessi voi olla esim. todo-lista.
 - Prosessi koostuu tietueista joilla voi olla useita eriryyppisiä kenttiä.
 - Prosessilla voi olla useita vaiheita esim. tekemättä, työn alla ja valmis.
 
-##Toteutus:
+## Toteutus:
 
 - Frontend: React
 - Backend: Node.js, Express ja Mongo DB
