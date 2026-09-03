@@ -6,6 +6,10 @@ const processSchema = new mongoose.Schema({
     required: true,
     minlength: 5,
   },
+  user: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User'
+  }
 })
 
 processSchema.set('toJSON', {
