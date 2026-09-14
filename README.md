@@ -11,7 +11,7 @@ Sovelluksen avulla voidaan rakentaa erilaisiin tarpeisiin mukautuva liiketoimint
 - Soveluksessa voi olla useita käyttäjiä.
 - Sovellukseen voi luoda prosesseja. Prosessi voi olla esim. todo-lista.
 - Prosessi koostuu tietueista joilla voi olla useita eri tyyppisiä kenttiä.
-- Prosessilla voi olla useita vaiheita esim. tekemättä, työn alla ja valmis.
+- Prosessin tietueilla voi olla useita vaiheita esim. tekemättä, työn alla ja valmis.
 
 ## Toteutus:
 

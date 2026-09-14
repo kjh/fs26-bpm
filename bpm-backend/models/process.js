@@ -6,6 +6,33 @@ const processSchema = new mongoose.Schema({
     required: true,
     minlength: 5,
   },
+
+  phases: [
+    { 
+      type: mongoose.Schema.Types.ObjectId, 
+      ref: 'Phase' 
+    }
+  ],
+
+  field_definitions: [
+    {   
+      type: { 
+        type: String, 
+        required: true 
+      },    
+      name: { 
+        type: String, 
+        required: true 
+      },  
+      phases: [
+        { 
+          type: mongoose.Schema.Types.ObjectId, 
+          ref: 'Phase' 
+        }
+      ]
+    }
+  ],
+
   user: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User'

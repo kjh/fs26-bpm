@@ -1,37 +1,72 @@
 const processesRouter = require('express').Router()
 const Process = require('../models/process')
+const Phase = require('../models/phase')
 
-processesRouter.get('/', (request, response) => {
-  Process.find({}).then((processes) => {
-    response.json(processes)
-  })
+processesRouter.get('/', async (request, response) => {
+  const processes = await Process.find({})
+    .populate("phases", { name: 1 })
+    .populate("field_definitions.phases", { name: 1 })
+  response.json(processes)
 })
 
-processesRouter.get('/:id', (request, response, next) => {
-  Process.findById(request.params.id)
-    .then((process) => {
-      if (process) {
-        response.json(process)
-      } else {
-        response.status(404).end()
+processesRouter.get('/:id', async (request, response, next) => {
+  try {
+    const process = await Process.findById(request.params.id);
+
+    if (process) {
+      response.json(process)
+    } else {
+      response.status(404).end()
+    }
+  } catch (error) {
+    next(error)
+  }
+})
+
+processesRouter.post('/', async (request, response, next) => {
+  const { name, phases, field_definitions } = request.body
+
+  if (!name || name.trim().length < 5) {
+    return response.status(400).json({
+      error: 'Prosessin nimi on pakollinen ja sen täytyy olla vähintään 5 merkkiä pitkä.'
+    })
+  }
+
+  try {
+    let formattedPhases = []
+    if (Array.isArray(phases)) {
+      formattedPhases = phases.map(phase => {
+        if (typeof phase === 'string') {
+          return { name: phase }
+        }
+        return phase
+      })
+    }
+
+    const savedPhases = await Phase.insertMany(formattedPhases)
+    const savedPhasesMap = new Map(savedPhases.map(phase => [phase.name, phase]))
+    const phaseIds = savedPhases.map(phase => phase.id);
+    const updatedFieds = field_definitions.map(field => {
+      return {
+        ...field,
+        phases: field.phases.map(name => savedPhasesMap.get(name))
       }
     })
-    .catch((error) => next(error))
-})
-
-processesRouter.post('/', (request, response, next) => {
-  const body = request.body
-
-  const process = new Process({
-    name: body.name,
-  })
-
-  process
-    .save()
-    .then((savedProcess) => {
-      response.json(savedProcess)
+    const process = new Process({
+      name: name,
+      phases: phaseIds,
+      field_definitions: updatedFieds
     })
-    .catch((error) => next(error))
+
+    try {
+      const savedProcess = await process.save()
+      response.status(201).json(savedProcess)
+    } catch (error) {
+      next(error)
+    }
+  } catch (error) {
+    next(error)
+  }
 })
 
 processesRouter.delete('/:id', (request, response, next) => {
