@@ -10,8 +10,12 @@ processesRouter.get('/', async (request, response) => {
 })
 
 processesRouter.get('/:id', async (request, response, next) => {
+
   try {
-    const process = await Process.findById(request.params.id);
+    const process = await Process.findById(request.params.id)
+      .populate("phases", { name: 1 })
+      .populate("field_definitions.phases", { name: 1 })
+      .lean()
 
     if (process) {
       response.json(process)
@@ -43,23 +47,29 @@ processesRouter.post('/', async (request, response, next) => {
       })
     }
 
-    const savedPhases = await Phase.insertMany(formattedPhases)
-    const savedPhasesMap = new Map(savedPhases.map(phase => [phase.name, phase]))
-    const phaseIds = savedPhases.map(phase => phase.id);
-    const updatedFieds = field_definitions.map(field => {
+    const savedPhases = await Phase.insertMany(formattedPhases, { writeConcern: { w: 'majority' } })
+    const savedPhasesMap = new Map(savedPhases.map(phase => [phase.name, phase._id]))
+    const phaseIds = savedPhases.map(phase => phase._id)
+
+    const updatedFields = field_definitions.map(field => {
       return {
         ...field,
         phases: field.phases.map(name => savedPhasesMap.get(name))
       }
     })
+
     const process = new Process({
       name: name,
       phases: phaseIds,
-      field_definitions: updatedFieds
+      field_definitions: updatedFields
     })
 
     try {
       const savedProcess = await process.save()
+      await savedProcess.populate([
+        { path: 'phases', select: 'name' },
+        { path: 'field_definitions.phases', select: 'name' }
+      ])
       response.status(201).json(savedProcess)
     } catch (error) {
       next(error)

@@ -25,4 +25,5 @@
 | 13.9  | 2    | prosessin ja vaiheiden mallien rakentamista | 
 | 14.9  | 2    | prosessin ja vaiheiden mallit tehty (toimii) | 
 |       | 2    | käyttöliittymä vastaamaan mallia | 
+| 15.9  | 3    | korjattu prosessien tallennusta ja näkymää | 
 | yht   | 54   |  | 

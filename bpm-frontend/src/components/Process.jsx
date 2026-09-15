@@ -27,6 +27,14 @@ const Process = ({ process, deleteProcess }) => {
           </li>
         ))}
       </ul>
+      <h3>Fields</h3>
+      <div>
+        {process.field_definitions.map((field, index) => (
+          <div style={{ display: 'flex', gap: '8px' }} key={index}>
+              {field.name} - {field.type} - {field.phases.flatMap(p => p.name).join(', ')}
+          </div>
+        ))}
+      </div>
     </div>
   )
 }

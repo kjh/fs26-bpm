@@ -21,9 +21,9 @@ const recordSchema = new mongoose.Schema({
   fields: [
     {
       _id: false, 
-      field_id: { 
+      field_definition: { 
         type: mongoose.Schema.Types.ObjectId,
-        //required: true 
+        required: true 
       },    
       value: { 
         type: mongoose.Schema.Types.Mixed,
