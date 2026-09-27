@@ -43,6 +43,7 @@ const Process = ({ process, deleteProcess, records, addRecord }) => {
       </div>
       <h3>Add record</h3>
       <DynamicForm
+        phases={process.phases}
         addRecord={addRecord}
         process_id={process.id}
         phase_id={process.phases[0].id}
@@ -50,7 +51,7 @@ const Process = ({ process, deleteProcess, records, addRecord }) => {
       />
       <h3>Records</h3>
       <div>
-        {records.map((record, i) => (
+        {records.map((record) => (
           <RecordCard record={record} />
         ))}
       </div>

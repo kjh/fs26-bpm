@@ -6,7 +6,7 @@ import { registerLocale } from 'react-datepicker'
 import { fi } from 'date-fns/locale/fi'
 registerLocale('fi', fi)
 
-const DynamicForm = ({ addRecord, process_id, phase_id, fields }) => {
+const DynamicForm = ({ phases, addRecord, process_id, phase_id, fields }) => {
   const cardStyle = {
     backgroundColor: '#fff',
     border: '1px solid #000',
@@ -52,12 +52,13 @@ const DynamicForm = ({ addRecord, process_id, phase_id, fields }) => {
 
     console.log('form data initial state', initialState)
     console.log('fields', fields)
+    console.log('phases', phases)
     return initialState
   }
 
   const [formData, setFormData] = useState(() => setInitialState())
 
-  const handleTitleChange = (name, value) => {
+  const handleChange = (name, value) => {
     setFormData((prev) => ({
       ...prev,
       [name]: value,
@@ -245,16 +246,28 @@ const DynamicForm = ({ addRecord, process_id, phase_id, fields }) => {
             <span style={labelStyle}>Title</span>
             <input
               value={formData['title']}
-              onChange={(e) => handleTitleChange('title', e.target.value)}
+              onChange={(e) => handleChange('title', e.target.value)}
               placeholder="title"
             />
+          </label>
+          <label style={fieldGroupStyle}>
+            <span style={labelStyle}>Phase</span>
+            <select
+              value={formData['current_phase']}
+              onChange={(e) => handleChange('current_phase', e.target.value)}
+            >
+              {phases.map((phase) => (
+                <option key={phase.id} value={phase.id}>
+                  {phase.name}
+                </option>
+              ))}
+            </select>
           </label>
         </div>
         {fields.map((field, index) => (
           <div key={index}>
             <label style={fieldGroupStyle}>
               <span style={labelStyle}>{field.name}</span>
-
               {renderField(field)}
             </label>
           </div>

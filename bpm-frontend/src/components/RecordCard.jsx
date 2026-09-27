@@ -3,14 +3,14 @@ const RecordCard = ({ record }) => {
     backgroundColor: '#fff',
     border: '1px solid #000',
     borderRadius: '16px',
-    padding: '20px',
+    padding: '16px',
     maxWidth: '350px',
     marginBottom: '15px',
   }
 
   const titleStyle = {
-    margin: '0 0 16px 0',
-    fontSize: '1.25rem',
+    margin: '0 0 8px 0',
+    fontSize: '1rem',
     fontWeight: 'bold',
     color: '#000',
   }
@@ -40,9 +40,11 @@ const RecordCard = ({ record }) => {
   console.log(record)
 
   return (
-    <div style={cardStyle}>
+    <div style={cardStyle} key={record.id}>
       <h3 style={titleStyle}>{record.title}</h3>
+      
       <div>
+        <span style={labelStyle}>Phase: {record.current_phase?.name}</span>
         {record.fields?.map((field, i) => (
           <div key={i} style={fieldGroupStyle}>
             <span style={labelStyle}>{field.field_definition?.name}</span>
