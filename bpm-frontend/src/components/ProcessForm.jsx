@@ -2,24 +2,24 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 
 const FIELD_CATEGORIES = {
-  "Text Content": [
-    { value: "text", label: "Text" },
-    { value: "predefined", label: "Predefined Options" },
-    { value: "textarea", label: "Text Area" },
-    { value: "subheader", label: "Subheader (header text field)" }
+  'Text Content': [
+    { value: 'text', label: 'Text' },
+    { value: 'predefined', label: 'Predefined Options' },
+    { value: 'textarea', label: 'Text Area' },
+    //{ value: "subheader", label: "Subheader (header text field)" }
   ],
-  "Numeric": [
-    { value: "numeric", label: "Numeric" },
-    { value: "numeric_unit", label: "Numeric Unit" }
+  Numeric: [
+    { value: 'numeric', label: 'Numeric' },
+    { value: 'numeric_unit', label: 'Numeric Unit' },
   ],
-  "Date & Time": [
-    { value: "date", label: "Date" },
-    { value: "date_range", label: "Date Range" },
-    { value: "time", label: "Time" },
-    { value: "time_range", label: "Time Range" },
-    { value: "datetime", label: "Date & Time" },
-    { value: "datetime_range", label: "Date & Time Range" }
-  ]
+  'Date & Time': [
+    { value: 'date', label: 'Date' },
+    { value: 'date_range', label: 'Date Range' },
+    { value: 'time', label: 'Time' },
+    //{ value: "time_range", label: "Time Range" },
+    { value: 'datetime', label: 'Date & Time' },
+    //{ value: "datetime_range", label: "Date & Time Range" }
+  ],
 }
 
 const ProcessForm = ({ createProcess }) => {
@@ -27,18 +27,26 @@ const ProcessForm = ({ createProcess }) => {
   const [newPhases, setNewPhases] = useState([])
   const [newFieldPhases, setNewFieldPhases] = useState([])
   const [newFieldDefinitions, setNewFieldDefinitions] = useState([])
-  
+  const [newOptions, setNewOptions] = useState([])
+
   const [currentPhaseName, setCurrentPhaseName] = useState('')
   const [currentFieldName, setCurrentFieldName] = useState('')
   const [currentFieldType, setCurrentFieldType] = useState('')
+  const [currentOption, setCurrentOption] = useState('')
 
   const navigate = useNavigate()
 
   const handlePhaseSelectChange = (event) => {
     event.preventDefault()
     const value = event.target.value
-    if (value && !newFieldPhases.includes(value)) {
-      setNewFieldPhases(newFieldPhases.concat(value))
+
+    if (value) {
+      setNewFieldPhases((prevPhases) => {
+        if (!prevPhases.includes(value)) {
+          return [...prevPhases, value]
+        }
+        return prevPhases
+      })
     }
     event.target.value = ''
   }
@@ -46,12 +54,14 @@ const ProcessForm = ({ createProcess }) => {
   const handleAddField = (event) => {
     event.preventDefault()
 
-    if (currentFieldName.trim() === '' || !currentFieldType || !newFieldPhases) return
+    if (currentFieldName.trim() === '' || !currentFieldType || !newFieldPhases)
+      return
 
     const field = {
       name: currentFieldName,
       type: currentFieldType,
-      phases: newFieldPhases
+      phases: newFieldPhases,
+      options: newOptions,
     }
 
     setNewFieldDefinitions(newFieldDefinitions.concat(field))
@@ -59,6 +69,7 @@ const ProcessForm = ({ createProcess }) => {
     setCurrentFieldName('')
     setCurrentFieldType('')
     setNewFieldPhases([])
+    setNewOptions([])
   }
 
   const handleAddPhase = (event) => {
@@ -70,20 +81,73 @@ const ProcessForm = ({ createProcess }) => {
     setCurrentPhaseName('')
   }
 
-  const addProcess = async event => {
+  const addProcess = async (event) => {
     event.preventDefault()
     const createdProcess = await createProcess({
       name: newProcessName,
       phases: newPhases,
       field_definitions: newFieldDefinitions,
     })
-    
+
     setNewProcessName('')
     setNewPhases([])
     setNewFieldDefinitions([])
 
     if (createdProcess && createdProcess.id)
       navigate(`/processes/${createdProcess.id}`)
+  }
+
+  const addPredefinedOption = () => {
+    setNewOptions(newOptions.concat(currentOption))
+    setCurrentOption('')
+  }
+
+  const optionsInput = () => {
+    switch (currentFieldType) {
+      case 'predefined':
+        return (
+          <label>
+            Add predefined options
+            <div style={{ display: 'flex', gap: '8px' }}>
+              <input
+                value={currentOption}
+                onChange={(event) => setCurrentOption(event.target.value)}
+                placeholder="prefefined option"
+              />
+              <button type="button" onClick={() => addPredefinedOption()}>
+                Add
+              </button>
+            </div>
+            {newOptions.length > 0 && (
+              <div>
+                Predefined options
+                {newOptions.map((option, index) => (
+                  <div style={{ display: 'flex', gap: '8px' }} key={index}>
+                    {option}
+                  </div>
+                ))}
+              </div>
+            )}
+          </label>
+        )
+
+      case 'numeric_unit':
+        return (
+          <label>
+            Add unit
+            <div style={{ display: 'flex', gap: '8px' }}>
+              <input
+                value={newOptions?.[0] || ''}
+                onChange={(event) => setNewOptions([event.target.value])}
+                placeholder="unit"
+              />
+            </div>
+          </label>
+        )
+
+      default:
+        return null
+    }
   }
 
   return (
@@ -97,7 +161,7 @@ const ProcessForm = ({ createProcess }) => {
             <div style={{ display: 'flex', gap: '8px' }}>
               <input
                 value={newProcessName}
-                onChange={event => setNewProcessName(event.target.value)}
+                onChange={(event) => setNewProcessName(event.target.value)}
                 placeholder="process name"
               />
             </div>
@@ -105,7 +169,8 @@ const ProcessForm = ({ createProcess }) => {
         </div>
 
         <div style={{ marginTop: '15px' }}>
-          <label>Add phases
+          <label>
+            Add phases
             <div style={{ display: 'flex', gap: '8px' }}>
               <input
                 value={currentPhaseName}
@@ -124,7 +189,9 @@ const ProcessForm = ({ createProcess }) => {
             <div>
               Phases
               {newPhases.map((phase, index) => (
-                <div style={{ display: 'flex', gap: '8px' }} key={index}>{phase}</div>
+                <div style={{ display: 'flex', gap: '8px' }} key={index}>
+                  {phase}
+                </div>
               ))}
             </div>
           )}
@@ -135,7 +202,9 @@ const ProcessForm = ({ createProcess }) => {
             <div>
               Fields
               {newFieldDefinitions.map((field, index) => (
-                <div style={{ display: 'flex', gap: '8px' }} key={index}>{field.name} - {field.type} - {field.phases.join(', ')}</div>
+                <div style={{ display: 'flex', gap: '8px' }} key={index}>
+                  {field.name} - {field.type} - {field.phases.join(', ')}
+                </div>
               ))}
             </div>
           )}
@@ -154,7 +223,7 @@ const ProcessForm = ({ createProcess }) => {
               <div>
                 <input
                   value={currentFieldName}
-                  onChange={event => setCurrentFieldName(event.target.value)}
+                  onChange={(event) => setCurrentFieldName(event.target.value)}
                   placeholder="field name"
                 />
               </div>
@@ -162,40 +231,48 @@ const ProcessForm = ({ createProcess }) => {
           </div>
 
           <div>
-            <label>Type
+            <label>
+              Field type
               <select
                 value={currentFieldType}
                 onChange={(event) => setCurrentFieldType(event.target.value)}
                 style={{ display: 'flex', gap: '8px' }}
               >
-                <option value="" disabled>-- Select field type --</option>
+                <option value="" disabled>
+                  -- Select field type --
+                </option>
                 {Object.entries(FIELD_CATEGORIES).map(([category, options]) => (
                   <optgroup key={category} label={category}>
-                    {options.map(opt => (
-                      <option key={opt.value} value={opt.value}>{opt.label}</option>
+                    {options.map((opt) => (
+                      <option key={opt.value} value={opt.value}>
+                        {opt.label}
+                      </option>
                     ))}
                   </optgroup>
                 ))}
               </select>
             </label>
           </div>
-
+          {optionsInput()}
           <div>
             <label>
-              Phases
+              Field phases
               <div style={{ display: 'flex', gap: '8px' }}>
                 <select
                   onChange={handlePhaseSelectChange}
                   defaultValue=""
                   style={{ display: 'flex', gap: '8px' }}
                 >
-                  <option value="" disabled>-- Select phase to add --</option>
+                  <option value="" disabled>
+                    -- Select phase to add --
+                  </option>
                   {newPhases
-                    .filter(phase => !newFieldPhases.includes(phase))
+                    .filter((phase) => !newFieldPhases.includes(phase))
                     .map((phase, index) => (
-                      <option key={index} value={phase}>{phase}</option>
-                    ))
-                  }
+                      <option key={index} value={phase}>
+                        {phase}
+                      </option>
+                    ))}
                 </select>
               </div>
             </label>
@@ -206,7 +283,9 @@ const ProcessForm = ({ createProcess }) => {
               <div>
                 Active phases
                 {newFieldPhases.map((phase, index) => (
-                  <div style={{ display: 'flex', gap: '8px' }} key={index}>{phase}</div>
+                  <div style={{ display: 'flex', gap: '8px' }} key={index}>
+                    {phase}
+                  </div>
                 ))}
               </div>
             )}

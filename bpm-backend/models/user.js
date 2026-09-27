@@ -4,15 +4,15 @@ const userSchema = mongoose.Schema({
   username: {
     type: String,
     required: true,
-    unique: true // username oltava yksikäsitteinen
+    unique: true, // username oltava yksikäsitteinen
   },
   name: String,
   passwordHash: String,
   processes: [
     {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'Process'
-    }
+      ref: 'Process',
+    },
   ],
 })
 
@@ -23,7 +23,7 @@ userSchema.set('toJSON', {
     delete returnedObject.__v
     // the passwordHash should not be revealed
     delete returnedObject.passwordHash
-  }
+  },
 })
 
 const User = mongoose.model('User', userSchema)

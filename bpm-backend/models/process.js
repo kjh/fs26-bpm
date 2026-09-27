@@ -8,35 +8,42 @@ const processSchema = new mongoose.Schema({
   },
 
   phases: [
-    { 
-      type: mongoose.Schema.Types.ObjectId, 
-      ref: 'Phase' 
-    }
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Phase',
+    },
   ],
 
   field_definitions: [
-    {   
-      type: { 
-        type: String, 
-        required: true 
-      },    
-      name: { 
-        type: String, 
-        required: true 
-      },  
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'FieldDefinition',
+    },
+    /*{
+      type: {
+        type: String,
+        required: true
+      },
+      name: {
+        type: String,
+        required: true
+      },
+      options: [
+        { type: String } 
+      ],
       phases: [
-        { 
-          type: mongoose.Schema.Types.ObjectId, 
-          ref: 'Phase' 
+        {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: 'Phase'
         }
       ]
-    }
+    }*/
   ],
 
   user: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'User'
-  }
+    ref: 'User',
+  },
 })
 
 processSchema.set('toJSON', {

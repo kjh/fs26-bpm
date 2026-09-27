@@ -1,15 +1,13 @@
 const Footer = () => {
   const footerStyle = {
-    color: 'green',
-    fontStyle: 'italic'
+    color: 'blue',
+    fontStyle: 'strong',
   }
 
   return (
     <div style={footerStyle}>
       <br />
-      <p>
-        BPM app, 2026
-      </p>
+      <p>BPM app, 2026</p>
     </div>
   )
 }
