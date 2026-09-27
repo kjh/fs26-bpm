@@ -20,6 +20,20 @@ recordsRouter.post('/', async (request, response, next) => {
     })
 
     const savedRecord = await newRecord.save()
+    await savedRecord.populate([
+      {
+        path: 'process',
+        select: { name: 1 }
+      },
+      {
+        path: 'current_phase',
+        select: { name: 1 }
+      },
+      {
+        path: 'fields.field_definition',
+        select: 'name type options'
+      }
+    ])
     response.status(201).json(savedRecord)
   } catch (error) {
     next(error)
