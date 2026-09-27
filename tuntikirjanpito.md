@@ -45,4 +45,5 @@
 |       | 4    | refactorointia  ui toimimaan tietokantamuutosten kanssa |
 | 27.9  | 3    | refactorointia ui toimintoja paranneltu (mm. kirjautuminen) |
 |       | 1    | prosessien poisto toimii (poistaa myös recordit ja phaset) |
-| yht   | 100  |  | 
+|       | 2    | ui parannuksia tietueille (mm. vaiheet ja kentät) |
+| yht   | 102  |  | 
