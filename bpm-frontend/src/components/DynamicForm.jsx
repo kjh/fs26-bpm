@@ -34,7 +34,7 @@ const DynamicForm = ({ phases, addRecord, process_id, phase_id, fields }) => {
     const initialState = {
       process_id,
       title: '',
-      current_phase: phase_id,
+      current_phase: phase_id, // luotaessa vain ensimmäinen vaihe sallittu
       fields: {}, // aluksi object
     }
 
@@ -155,7 +155,6 @@ const DynamicForm = ({ phases, addRecord, process_id, phase_id, fields }) => {
               type="number"
               value={formData.fields[field.name]}
               onChange={(e) => handleFieldChange(field.name, e.target.value)}
-              placeholder={unit}
             />
           </>
         )
