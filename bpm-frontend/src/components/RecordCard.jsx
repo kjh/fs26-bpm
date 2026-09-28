@@ -1,3 +1,6 @@
+import EditableTextField from './EditableTextField'
+import EditableTextArea from './EditableTextarea'
+
 const RecordCard = ({ record }) => {
   const cardStyle = {
     backgroundColor: '#fff',
@@ -42,29 +45,31 @@ const RecordCard = ({ record }) => {
   const renderValue = (field) => {
     const type = field.field_definition?.type
     const value = field.value
-    const unit = type === 'numeric_unit' ? field.field_definition?.options[0] : ''
 
     switch (type) {
+      case 'numeric':
       case 'numeric_unit':
-        return <span style={valueStyle}>{value} {unit}</span>
+        return <EditableTextField field={field} inputType={'numeric'} />
 
-      case 'Date':
-        return new Date(value).toLocaleDateString('fi-FI') 
+      case 'date':
+        return <EditableTextField field={field} inputType={'date'} />
+
+      case 'datetime':
+        return <EditableTextField field={field} inputType={'datetime-local'} />
+
+      case 'time':
+        return <EditableTextField field={field} inputType={'time'} />
 
       case 'textarea':
-        return (
-          <div style={{ ...valueStyle, whiteSpace: 'pre-wrap', lineHeight: '1.5' }}>
-            {String(value)}
-          </div>
-        )
+        return <EditableTextArea valueStyle={valueStyle} field={field} />
 
       default:
-        return <span style={valueStyle}>{value}</span> // text, prefefined, numeric
+        return <EditableTextField field={field} inputType={'text'} />
     }
-  };
+  }
 
   return (
-    <div style={cardStyle} key={record.id}>
+    <div style={cardStyle}>
       <h3 style={titleStyle}>{record.title}</h3>
 
       <div>
