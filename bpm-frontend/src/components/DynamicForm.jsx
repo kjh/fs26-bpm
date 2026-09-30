@@ -109,13 +109,14 @@ const DynamicForm = ({ phases, addRecord, process_id, phase_id, fields }) => {
   }
 
   // yksittäinen form input
-  const renderField = (field) => {
+  const renderField = (field, id) => {
     const options = field.options || []
 
     switch (field.type) {
       case 'text':
         return (
           <input
+            id={id}
             type="text"
             value={formData.fields[field.name]}
             onChange={(e) => handleFieldChange(field.name, e.target.value)}
@@ -125,6 +126,7 @@ const DynamicForm = ({ phases, addRecord, process_id, phase_id, fields }) => {
       case 'textarea':
         return (
           <textarea
+            id={id}
             value={formData.fields[field.name]}
             onChange={(e) => handleFieldChange(field.name, e.target.value)}
             rows={3}
@@ -134,6 +136,7 @@ const DynamicForm = ({ phases, addRecord, process_id, phase_id, fields }) => {
       case 'predefined':
         return (
           <select
+            id={id}
             value={formData.fields[field.name]}
             onChange={(e) => handleFieldChange(field.name, e.target.value)}
           >
@@ -152,6 +155,7 @@ const DynamicForm = ({ phases, addRecord, process_id, phase_id, fields }) => {
           <>
             Unit: {unit}:
             <input
+              id={id}
               type="number"
               value={formData.fields[field.name]}
               onChange={(e) => handleFieldChange(field.name, e.target.value)}
@@ -162,6 +166,7 @@ const DynamicForm = ({ phases, addRecord, process_id, phase_id, fields }) => {
       case 'numeric':
         return (
           <input
+            id={id}
             type="number"
             value={formData.fields[field.name]}
             onChange={(e) => handleFieldChange(field.name, e.target.value)}
@@ -171,51 +176,78 @@ const DynamicForm = ({ phases, addRecord, process_id, phase_id, fields }) => {
       case 'date':
         return (
           <input
+            id={id}
             type="date"
             value={formData.fields[field.name]}
             onChange={(e) => handleFieldChange(field.name, e.target.value)}
+            onClick={(e) => {
+              try {
+                e.target.showPicker();
+              } catch (err) {
+                console.log("showPicker ei tuettu tässä selaimessa", err);
+              }
+            }}
           />
         )
 
       case 'time':
         return (
           <input
+            id={id}
             type="time"
             value={formData.fields[field.name]}
             onChange={(e) => handleFieldChange(field.name, e.target.value)}
+            onClick={(e) => {
+              try {
+                e.target.showPicker();
+              } catch (err) {
+                console.log("showPicker ei tuettu tässä selaimessa", err);
+              }
+            }}
           />
         )
 
       case 'datetime':
         return (
           <input
+            id={id}
             type="datetime-local"
             value={formData.fields[field.name]}
             onChange={(e) => handleFieldChange(field.name, e.target.value)}
+            onClick={(e) => {
+              try {
+                e.target.showPicker();
+              } catch (err) {
+                console.log("showPicker ei tuettu tässä selaimessa", err);
+              }
+            }}
           />
         )
 
-      case 'date_range':
-        const fieldValue = formData.fields[field.name]
+      case 'date_range': {
+        const fieldValue = formData.fields[field.name] || ''
         const [startStr, endStr] = fieldValue.split(',')
+
         const startDate = startStr ? new Date(startStr) : null
         const endDate = endStr ? new Date(endStr) : null
 
+        const toISODateString = (date) => {
+          if (!date) return ''
+          const offset = date.getTimezoneOffset()
+          const localDate = new Date(date.getTime() - offset * 60 * 1000)
+          return localDate.toISOString().split('T')[0]
+        }
+
         return (
           <DatePicker
+            id={id}
             selectsRange={true}
             startDate={startDate}
             endDate={endDate}
             onChange={(update) => {
               const [startUpdate, endUpdate] = update
-
-              const startString = startUpdate
-                ? startUpdate.toLocaleDateString('fi-FI')
-                : ''
-
-              const endString = endUpdate
-                ? endUpdate.toLocaleDateString('fi-FI')
-                : ''
+              const startString = toISODateString(startUpdate)
+              const endString = toISODateString(endUpdate)
 
               let fieldStr = ''
               if (startUpdate || endUpdate) {
@@ -224,13 +256,17 @@ const DynamicForm = ({ phases, addRecord, process_id, phase_id, fields }) => {
 
               handleFieldChange(field.name, fieldStr)
             }}
+            style={{ width: 'auto' }}
             isClearable={true}
-            placeholderText="Valitse aikaväli"
+            placeholderText="Select date range"
             locale="fi"
             dateFormat="dd.MM.yyyy"
             className="form-input daterange-picker"
+            wrapperStyle={{ display: "inline-block", width: "auto" }}
+            autoComplete="off"
           />
         )
+      }
 
       default:
         return null
@@ -244,6 +280,7 @@ const DynamicForm = ({ phases, addRecord, process_id, phase_id, fields }) => {
           <label style={fieldGroupStyle}>
             <span style={labelStyle}>Title</span>
             <input
+              id={'field-title'}
               value={formData['title']}
               onChange={(e) => handleChange('title', e.target.value)}
               placeholder="title"
@@ -252,6 +289,7 @@ const DynamicForm = ({ phases, addRecord, process_id, phase_id, fields }) => {
           <label style={fieldGroupStyle}>
             <span style={labelStyle}>Phase</span>
             <select
+              id={'field-select'}
               value={formData['current_phase']}
               onChange={(e) => handleChange('current_phase', e.target.value)}
             >
@@ -263,14 +301,17 @@ const DynamicForm = ({ phases, addRecord, process_id, phase_id, fields }) => {
             </select>
           </label>
         </div>
-        {fields.map((field, index) => (
-          <div key={index}>
-            <label style={fieldGroupStyle}>
-              <span style={labelStyle}>{field.name}</span>
-              {renderField(field)}
-            </label>
-          </div>
-        ))}
+        {fields.map((field) => {
+          const uniqueFieldId = `field-${field.id}`;
+          return (
+            <div key={field.id} style={fieldGroupStyle}>
+              <label htmlFor={uniqueFieldId} style={labelStyle}>
+                {field.name}
+              </label>
+              {renderField(field, uniqueFieldId)}
+            </div>
+          )
+        })}
 
         <button type="submit">save record</button>
       </form>

@@ -1,5 +1,6 @@
 import EditableTextField from './EditableTextField'
 import EditableTextArea from './EditableTextarea'
+import EditableDateRange from './EditableDateRange'
 
 const RecordCard = ({ record }) => {
   const cardStyle = {
@@ -42,45 +43,51 @@ const RecordCard = ({ record }) => {
 
   console.log(record)
 
-  const renderValue = (field) => {
+  const renderValue = (field, uniqueFieldId) => {
     const type = field.field_definition?.type
     const value = field.value
 
     switch (type) {
       case 'numeric':
       case 'numeric_unit':
-        return <EditableTextField field={field} inputType={'numeric'} />
+        return <EditableTextField field={field} inputType={'numeric'} uniqueFieldId={uniqueFieldId}/>
 
       case 'date':
-        return <EditableTextField field={field} inputType={'date'} />
+        return <EditableTextField field={field} inputType={'date'} uniqueFieldId={uniqueFieldId}/>
 
       case 'datetime':
-        return <EditableTextField field={field} inputType={'datetime-local'} />
+        return <EditableTextField field={field} inputType={'datetime-local'} uniqueFieldId={uniqueFieldId}/>
+
+      case 'date_range':
+        return <EditableDateRange field={field} valueStyle={valueStyle} uniqueFieldId={uniqueFieldId}/>
 
       case 'time':
-        return <EditableTextField field={field} inputType={'time'} />
+        return <EditableTextField field={field} inputType={'time'} uniqueFieldId={uniqueFieldId}/>
 
       case 'textarea':
-        return <EditableTextArea valueStyle={valueStyle} field={field} />
+        return <EditableTextArea valueStyle={valueStyle} field={field} uniqueFieldId={uniqueFieldId}/>
 
       default:
-        return <EditableTextField field={field} inputType={'text'} />
+        return <EditableTextField field={field} inputType={'text'} uniqueFieldId={uniqueFieldId}/>
     }
   }
 
   return (
     <div style={cardStyle}>
-      <h3 style={titleStyle}>{record.title}</h3>
+      <h3 style={titleStyle} id={`title-field-${record.id}`}>{record.title}</h3>
+      <span style={labelStyle} id={`phase-field-${record.id}`}>Phase: {record.current_phase?.name}</span>
 
-      <div>
-        <span style={labelStyle}>Phase: {record.current_phase?.name}</span>
-        {record.fields?.map((field, i) => (
-          <div key={i} style={fieldGroupStyle}>
-            <span style={labelStyle}>{field.field_definition?.name}</span>
-            {renderValue(field)}
+      {record.fields.map((field, i) => {
+        const uniqueFieldId = `field-${i}-${field.id}`;
+        return (
+          <div key={field.id} style={fieldGroupStyle}>
+            <label htmlFor={uniqueFieldId} style={labelStyle}>
+              {field.field_definition?.name}
+            </label>
+            {renderValue(field, uniqueFieldId)}
           </div>
-        ))}
-      </div>
+        )
+      })}
     </div>
   )
 }

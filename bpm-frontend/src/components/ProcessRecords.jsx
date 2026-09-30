@@ -10,6 +10,7 @@ const ProcessRecords = ({ addRecord, process }) => {
     <div>
       <h1>{process.name} Records</h1>
       <DynamicForm
+        phases={process.phases}
         addRecord={addRecord}
         process_id={process.id}
         phase_id={process.phases[0].id}
