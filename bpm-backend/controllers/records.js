@@ -50,7 +50,7 @@ recordsRouter.get('/', async (request, response, next) => {
       .populate('current_phase', { name: 1 })
       .populate({
         path: 'fields.field_definition',
-        select: 'name type options',
+        select: 'name type options _id',
       })
     console.log('got records', records)
     response.json(records)
