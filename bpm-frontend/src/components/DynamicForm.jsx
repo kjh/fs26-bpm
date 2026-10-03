@@ -19,7 +19,7 @@ const DynamicForm = ({ phases, addRecord, process_id, phase_id, fields }) => {
 
   const fieldGroupStyle = {
     display: 'flex',
-    flexDirection: 'column', // nimi ja arvo allekkain
+    flexDirection: 'column',
     gap: '4px',
     marginBottom: '12px',
   }
@@ -182,9 +182,9 @@ const DynamicForm = ({ phases, addRecord, process_id, phase_id, fields }) => {
             onChange={(e) => handleFieldChange(field.name, e.target.value)}
             onClick={(e) => {
               try {
-                e.target.showPicker();
+                e.target.showPicker()
               } catch (err) {
-                console.log("showPicker ei tuettu tässä selaimessa", err);
+                console.log('showPicker ei tuettu tässä selaimessa', err)
               }
             }}
           />
@@ -199,9 +199,9 @@ const DynamicForm = ({ phases, addRecord, process_id, phase_id, fields }) => {
             onChange={(e) => handleFieldChange(field.name, e.target.value)}
             onClick={(e) => {
               try {
-                e.target.showPicker();
+                e.target.showPicker()
               } catch (err) {
-                console.log("showPicker ei tuettu tässä selaimessa", err);
+                console.log('showPicker ei tuettu tässä selaimessa', err)
               }
             }}
           />
@@ -216,9 +216,9 @@ const DynamicForm = ({ phases, addRecord, process_id, phase_id, fields }) => {
             onChange={(e) => handleFieldChange(field.name, e.target.value)}
             onClick={(e) => {
               try {
-                e.target.showPicker();
+                e.target.showPicker()
               } catch (err) {
-                console.log("showPicker ei tuettu tässä selaimessa", err);
+                console.log('showPicker ei tuettu tässä selaimessa', err)
               }
             }}
           />
@@ -262,7 +262,7 @@ const DynamicForm = ({ phases, addRecord, process_id, phase_id, fields }) => {
             locale="fi"
             dateFormat="dd.MM.yyyy"
             className="form-input daterange-picker"
-            wrapperStyle={{ display: "inline-block", width: "auto" }}
+            wrapperStyle={{ display: 'inline-block', width: 'auto' }}
             autoComplete="off"
           />
         )
@@ -302,7 +302,7 @@ const DynamicForm = ({ phases, addRecord, process_id, phase_id, fields }) => {
           </label>
         </div>
         {fields.map((field) => {
-          const uniqueFieldId = `field-${field.id}`;
+          const uniqueFieldId = `field-${field.id}`
           return (
             <div key={field.id} style={fieldGroupStyle}>
               <label htmlFor={uniqueFieldId} style={labelStyle}>

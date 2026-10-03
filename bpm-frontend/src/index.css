@@ -18,3 +18,33 @@ h1 {
   padding: 10px;
   margin-bottom: 10px;
 }
+
+/* tietueiden muokattavat kentät */
+.inline-editable-input {
+  box-sizing: border-box;
+  width: 100%;
+  border: 1px solid transparent;
+  background-color: transparent;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-family: inherit;
+  font-size: inherit;
+  color: #111827;
+  resize: vertical;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: pre-wrap;
+}
+
+.inline-editable-input:focus {
+  background-color: #ffffff;
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+  outline: none;
+  cursor: text;
+}
+
+.inline-editable-input::placeholder {
+  color: #9ca3af;
+  font-style: italic;
+}

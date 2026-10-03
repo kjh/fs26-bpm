@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 
-const EditableTextField = ({
+const EditableSelectField = ({
   field,
   valueStyle,
   inputType,
@@ -10,7 +10,7 @@ const EditableTextField = ({
   focusedFieldId,
 }) => {
   const [value, setValue] = useState(field.value)
-  const unit = field.field_definition?.options?.[0] || ''
+  const options = field.field_definition?.options || ['Empty']
 
   const fieldId = field._id || field.id
 
@@ -49,19 +49,24 @@ const EditableTextField = ({
             htmlFor={uniqueFieldId}
           >
             {field.field_definition?.name}
-            {`${inputType === 'number' && unit ? ` (${unit})` : ''}`}
           </label>
 
-          <input
+          <select
             id={uniqueFieldId}
             name={field._id || field.id}
-            type={inputType}
             value={value}
             onChange={(e) => setValue(e.target.value)}
-            placeholder="Empty"
             className="inline-editable-input"
             autoFocus={focusedFieldId === uniqueFieldId}
-          />
+          >
+            {options.map((option, index) => {
+              return (
+                <option key={index} value={option}>
+                  {option}
+                </option>
+              )
+            })}
+          </select>
         </div>
       ) : (
         <div>
@@ -76,17 +81,11 @@ const EditableTextField = ({
           >
             {field.field_definition?.name}
           </div>
-          {value ? (
-            <>
-              {`${String(value)}${inputType === 'number' && unit ? ` ${unit}` : ''}`}
-            </>
-          ) : (
-            <em>Empty</em>
-          )}
+          {value ? <>{String(value)}</> : <em>Empty</em>}
         </div>
       )}
     </>
   )
 }
 
-export default EditableTextField
+export default EditableSelectField

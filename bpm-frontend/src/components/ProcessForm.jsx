@@ -110,6 +110,7 @@ const ProcessForm = ({ createProcess }) => {
             Add predefined options
             <div style={{ display: 'flex', gap: '8px' }}>
               <input
+                id="predefinedOptions"
                 value={currentOption}
                 onChange={(event) => setCurrentOption(event.target.value)}
                 placeholder="prefefined option"
@@ -137,6 +138,7 @@ const ProcessForm = ({ createProcess }) => {
             Add unit
             <div style={{ display: 'flex', gap: '8px' }}>
               <input
+                id="numericUnit"
                 value={newOptions?.[0] || ''}
                 onChange={(event) => setNewOptions([event.target.value])}
                 placeholder="unit"
@@ -160,6 +162,7 @@ const ProcessForm = ({ createProcess }) => {
             Process name
             <div style={{ display: 'flex', gap: '8px' }}>
               <input
+                id="processName"
                 value={newProcessName}
                 onChange={(event) => setNewProcessName(event.target.value)}
                 placeholder="process name"
@@ -173,6 +176,7 @@ const ProcessForm = ({ createProcess }) => {
             Add phases
             <div style={{ display: 'flex', gap: '8px' }}>
               <input
+                id="phaseName"
                 value={currentPhaseName}
                 onChange={(event) => setCurrentPhaseName(event.target.value)}
                 placeholder="phase name"
@@ -222,6 +226,7 @@ const ProcessForm = ({ createProcess }) => {
               Field name
               <div>
                 <input
+                  id="fieldName"
                   value={currentFieldName}
                   onChange={(event) => setCurrentFieldName(event.target.value)}
                   placeholder="field name"
@@ -234,6 +239,7 @@ const ProcessForm = ({ createProcess }) => {
             <label>
               Field type
               <select
+                id="fieldType"
                 value={currentFieldType}
                 onChange={(event) => setCurrentFieldType(event.target.value)}
                 style={{ display: 'flex', gap: '8px' }}
@@ -259,6 +265,7 @@ const ProcessForm = ({ createProcess }) => {
               Field phases
               <div style={{ display: 'flex', gap: '8px' }}>
                 <select
+                  id="fieldPhases"
                   onChange={handlePhaseSelectChange}
                   defaultValue=""
                   style={{ display: 'flex', gap: '8px' }}

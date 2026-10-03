@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
 import DatePicker from 'react-datepicker'
 import 'react-datepicker/dist/react-datepicker.css'
@@ -6,8 +6,15 @@ import { registerLocale } from 'react-datepicker'
 import { fi } from 'date-fns/locale/fi'
 registerLocale('fi', fi)
 
-const EditableDateRange = ({ field, valueStyle, uniqueFieldId }) => {
-  const [isEditing, setIsEditing] = useState(false)
+const EditableDateRange = ({
+  field,
+  valueStyle,
+  uniqueFieldId,
+  isEditing,
+  fieldsRef,
+  focusedFieldId,
+}) => {
+  const [isEditingRange, setIsEditingRange] = useState(false)
   const [value, setValue] = useState(field.value)
 
   const fieldValue = value || ''
@@ -23,52 +30,97 @@ const EditableDateRange = ({ field, valueStyle, uniqueFieldId }) => {
     return localDate.toISOString().split('T')[0]
   }
 
+  const fieldId = field._id || field.id
+
+  useEffect(() => {
+    if (isEditing && fieldsRef && fieldsRef.current) {
+      const originalValue = field.value || '' // propsista
+
+      if (value !== originalValue) {
+        // onko muuttunut
+        fieldsRef.current[fieldId] = value
+        console.log('Uusi arvo:', value)
+      } else {
+        delete fieldsRef.current[fieldId]
+      }
+    }
+
+    return () => {
+      if (fieldsRef && fieldsRef.current) {
+        delete fieldsRef.current[fieldId]
+      }
+    }
+  }, [value, isEditing, fieldId, fieldsRef, field.value])
+
   return (
     <>
-      {isEditing ? (
-        <DatePicker
-          id={uniqueFieldId}
-          selectsRange={true}
-          startDate={startDate}
-          endDate={endDate}
-          onChange={(update) => {
-            const [startUpdate, endUpdate] = update
-            const startString = toISODateString(startUpdate)
-            const endString = toISODateString(endUpdate)
+      {isEditing || isEditingRange ? (
+        <div key={field.id} style={valueStyle}>
+          <label
+            style={{
+              fontSize: '0.85rem',
+              color: '#000',
+              fontWeight: 'bold',
+              display: 'block',
+              marginBottom: '4px',
+            }}
+            htmlFor={uniqueFieldId}
+          >
+            {field.field_definition?.name}
+          </label>
 
-            let fieldStr = ''
-            if (startUpdate || endUpdate) {
-              fieldStr = `${startString},${endString}`
-            }
+          <DatePicker
+            id={uniqueFieldId}
+            selectsRange={true}
+            startDate={startDate}
+            endDate={endDate}
+            onChange={(update) => {
+              const [startUpdate, endUpdate] = update
+              const startString = toISODateString(startUpdate)
+              const endString = toISODateString(endUpdate)
 
-            if (startUpdate && endUpdate) {
-              setIsEditing(false)
-            } /*else if (!startUpdate && !endUpdate) {
+              let fieldStr = ''
+              if (startUpdate || endUpdate) {
+                fieldStr = `${startString},${endString}`
+              }
+
+              if (startUpdate && endUpdate) {
+                setIsEditingRange(false)
+              } /*else if (!startUpdate && !endUpdate) {
               setIsEditing(false) // isClearable 
             }*/
 
-            setValue(fieldStr)
-          }}
-          open={true}
-          onClickOutside={() => setIsEditing(false)} 
-          shouldCloseOnSelect={false}  
-          style={{ width: 'auto' }}
-          //isClearable={true} jos ei pakollinen
-          placeholderText="Select date range"
-          locale="fi"
-          dateFormat="dd.MM.yyyy"
-          className="form-input daterange-picker"
-          wrapperStyle={{ display: "inline-block", width: "auto" }}
-        />
+              setValue(fieldStr)
+            }}
+            //open={true}
+            onClickOutside={() => setIsEditingRange(false)}
+            shouldCloseOnSelect={false}
+            style={{ width: 'auto' }}
+            //isClearable={true} jos ei pakollinen
+            placeholderText="Select date range"
+            locale="fi"
+            dateFormat="dd.MM.yyyy"
+            className="form-input daterange-picker"
+            wrapperStyle={{ display: 'inline-block', width: 'auto' }}
+            autoFocus={focusedFieldId === uniqueFieldId}
+          />
+        </div>
       ) : (
-        <div
-          onClick={() => setIsEditing(true)}
-          style={{
-            ...valueStyle,
-            cursor: 'pointer',
-          }}
-        >
-          {String(value).replace(',', ' ')}
+        <div>
+          <div
+            style={{
+              fontSize: '0.85rem',
+              color: '#000',
+              fontWeight: 'bold',
+              display: 'block',
+              marginBottom: '4px',
+            }}
+          >
+            {field.field_definition?.name}
+          </div>
+          <div id={uniqueFieldId} onClick={() => setIsEditingRange(true)}>
+            {String(value).replace(',', ' ')}
+          </div>
         </div>
       )}
     </>
