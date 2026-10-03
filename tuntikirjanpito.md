@@ -47,4 +47,12 @@
 |       | 1    | prosessien poisto toimii (poistaa myös recordit ja phaset) |
 |       | 2    | ui parannuksia tietueille (mm. vaiheet ja kentät) |
 | 28.9  | 4    | muokattavat kentät ym. parannuksia prosessinäkymään |
-| yht   | 106  |  | 
+| 29.9  | 3    | muokattavat kentät daterange ym. lisäyksiä |
+| 30.9  | 1    | daterange korjattu |
+|       | 3    | muokattavien kenttien refactorointia (input-kentät ja css) |
+|  1.10 | 3    | muokattavien kenttien refactorointia (input-kentät ja css) |
+|  2.10 | 2    | muokattavien kenttien refactorointia | (yht 118)
+|  3.10 | 4    | muokattavien kenttien refactorointia (löytyi sopiva tapa) ja koodin siistimistä |
+|       | 2    | tietueen kenttien valinta kohdistuu oikein|
+|       | 2    | jos tietueen kentän arvo ei muutu ei tallenneta/muokata |
+| yht   | 126  |  | 

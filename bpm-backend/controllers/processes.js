@@ -9,12 +9,15 @@ processesRouter.get('/', async (request, response) => {
     .populate('phases', { name: 1 })
     .populate({
       path: 'field_definitions',
-      select: 'name type options phases',
+      select: 'name type options phases _id',
       populate: {
         path: 'phases',
         select: { name: 1 },
       },
     })
+
+  console.log('processes get /', processes)
+
   response.json(processes)
 })
 
@@ -29,6 +32,8 @@ processesRouter.get('/:id', async (request, response, next) => {
           select: { name: 1 },
         },
       })
+
+    console.log('process get id', process)
 
     if (process) {
       response.json(process)
