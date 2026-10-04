@@ -61,7 +61,12 @@ const EditableTextArea = ({
           />
         </div>
       ) : (
-        <div>
+        <div
+          style={{
+            whiteSpace: 'pre-wrap',
+            lineHeight: '1.5',
+          }}
+        >
           <div
             style={{
               fontSize: '0.85rem',

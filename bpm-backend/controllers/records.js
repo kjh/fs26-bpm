@@ -2,8 +2,82 @@ const recordsRouter = require('express').Router({ mergeParams: true })
 const Process = require('../models/process')
 const Record = require('../models/record')
 
+recordsRouter.put('/:id', async (request, response, next) => {
+  console.log('recordsRouter put')
+  try {
+    const recordId = request.params.id
+    const processId = request.params.processId
+    const updatedFields = request.body?.fields
+    const updatedTitle = request.body?.title
+
+    console.log('processId', processId)
+    console.log('recordId', recordId)
+
+    if (!updatedFields && !updatedTitle) {
+      return response.status(204).send()
+    }
+
+    const recordExists = await Record.exists({ _id: recordId })
+    if (!recordExists) {
+      return response.status(404).json({ error: 'Record not found' })
+    }
+
+    const record = await Record.findById(recordId)
+    console.log('updatedTitle', updatedTitle)
+    console.log('updatedFields', updatedFields)
+    console.log('record.fields', record.fields)
+
+    if (updatedFields) {
+      record.fields = record.fields.map((field) => {
+        const fieldId = field._id
+
+        if (updatedFields[fieldId] !== undefined) {
+          return {
+            ...field,
+            value: updatedFields[fieldId],
+          }
+        }
+
+        return field
+      })
+
+      record.markModified('fields')
+    }
+
+    if (updatedTitle) {
+      record.title = updatedTitle
+      record.markModified('title')
+    }
+
+    const savedRecord = await record.save()
+
+    await savedRecord.populate([
+      {
+        path: 'process',
+        select: { name: 1 },
+      },
+      {
+        path: 'current_phase',
+        select: { name: 1 },
+      },
+      {
+        path: 'title',
+        select: { name: 1 },
+      },
+      {
+        path: 'fields.field_definition',
+        select: 'name type options _id',
+      },
+    ])
+
+    response.status(200).json(savedRecord)
+  } catch (error) {
+    next(error)
+  }
+})
+
 recordsRouter.post('/', async (request, response, next) => {
-  console.log('recordsRouter')
+  console.log('recordsRouter post')
   try {
     const { processId } = request.params
 
@@ -23,16 +97,16 @@ recordsRouter.post('/', async (request, response, next) => {
     await savedRecord.populate([
       {
         path: 'process',
-        select: { name: 1 }
+        select: { name: 1 },
       },
       {
         path: 'current_phase',
-        select: { name: 1 }
+        select: { name: 1 },
       },
       {
         path: 'fields.field_definition',
-        select: 'name type options'
-      }
+        select: 'name type options',
+      },
     ])
     response.status(201).json(savedRecord)
   } catch (error) {

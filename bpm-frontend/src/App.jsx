@@ -82,12 +82,32 @@ const App = () => {
   }
 
   const addRecord = async (recordObject) => {
-    console.log('recordObject', recordObject)
+    console.log('addRecord recordObject', recordObject)
     const createdRecord = await recordService.create(recordObject)
 
     setRecords(records.concat(createdRecord))
 
     return createdRecord
+  }
+
+  const updateRecord = async (processId, recordId, recordObject) => {
+    console.log('processId', processId)
+    console.log('recordId', recordId)
+    console.log('updateRecord recordObject', recordObject)
+    const updatedRecord = await recordService.update(
+      processId,
+      recordId,
+      recordObject,
+    )
+    console.log('updateRecord returns', updatedRecord)
+
+    setRecords((previousRecords) =>
+      previousRecords.map((record) =>
+        record.id === updatedRecord.id ? updatedRecord : record,
+      ),
+    )
+
+    return updatedRecord
   }
 
   const deleteProcess = (id) => {
@@ -157,6 +177,7 @@ const App = () => {
               deleteProcess={deleteProcess}
               records={records}
               addRecord={addRecord}
+              updateRecord={updateRecord}
             />
           }
         />

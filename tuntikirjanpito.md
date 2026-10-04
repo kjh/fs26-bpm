@@ -55,4 +55,5 @@
 |  3.10 | 4    | muokattavien kenttien refactorointia (löytyi sopiva tapa) ja koodin siistimistä |
 |       | 2    | tietueen kenttien valinta kohdistuu oikein|
 |       | 2    | jos tietueen kentän arvo ei muutu ei tallenneta/muokata |
-| yht   | 126  |  | 
+|  4.10 | 4    | muokattavien kenttien tallennus toimii (title lisätty) |
+| yht   | 130  |  | 

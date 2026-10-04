@@ -16,11 +16,12 @@ const EditableTextField = ({
 
   useEffect(() => {
     if (isEditing && fieldsRef && fieldsRef.current) {
-      const originalValue = field.value || '' // propsista
+      const originalValue = field.value // propsista
 
       if (value !== originalValue) {
         // onko muuttunut
         fieldsRef.current[fieldId] = value
+        console.log('fieldId', fieldId)
         console.log('Uusi arvo:', value)
       } else {
         delete fieldsRef.current[fieldId]

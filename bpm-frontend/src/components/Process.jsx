@@ -4,7 +4,13 @@ import RecordCard from './RecordCard'
 import DynamicForm from './DynamicForm'
 import Togglable from './Togglable'
 
-const Process = ({ process, deleteProcess, records, addRecord }) => {
+const Process = ({
+  process,
+  deleteProcess,
+  records,
+  addRecord,
+  updateRecord,
+}) => {
   const id = useParams().id
   const navigate = useNavigate()
 
@@ -56,7 +62,11 @@ const Process = ({ process, deleteProcess, records, addRecord }) => {
       </Togglable>
       <h3>Records</h3>
       {records.map((record) => (
-        <RecordCard key={record.id} record={record} />
+        <RecordCard
+          key={record.id}
+          record={record}
+          updateRecord={updateRecord}
+        />
       ))}
     </div>
   )

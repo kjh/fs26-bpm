@@ -4,10 +4,12 @@ import EditableTextArea from './EditableTextarea'
 import EditableDateRange from './EditableDateRange'
 import EditableSelectField from './EditableSelectField'
 
-const RecordCard = ({ record }) => {
+const RecordCard = ({ record, updateRecord }) => {
   const [isEditing, setIsEditing] = useState(false)
   const [focusedFieldId, setFocusedFieldId] = useState(null)
   const fieldsRef = useRef({})
+
+  const titleId = `field-title-${record.id}`
 
   const cardStyle = {
     backgroundColor: '#fff',
@@ -48,6 +50,7 @@ const RecordCard = ({ record }) => {
   }
 
   const handleCardClick = (e, uniqueFieldId) => {
+    console.log('title', record.title)
     if (!isEditing) {
       setIsEditing(true)
       setFocusedFieldId(uniqueFieldId)
@@ -62,11 +65,23 @@ const RecordCard = ({ record }) => {
     const updatedValues = fieldsRef.current
     console.log('Arvot', updatedValues)
 
+    const updatedRecord = {}
+
+    if (updatedValues && updatedValues[titleId] !== undefined) {
+      const updatedtitle = updatedValues[titleId]
+      delete updatedValues[titleId]
+      updatedRecord['title'] = updatedtitle
+    }
+
+    if (updatedValues && Object.keys(updatedValues).length > 0) {
+      updatedRecord['fields'] = updatedValues
+    }
+    updateRecord(record.process.id, record.id, updatedRecord)
     setIsEditing(false)
   }
 
   const renderField = (field, uniqueFieldId, isEditing) => {
-    const type = field.field_definition?.type
+    const type = field.field_definition?.type || 'text'
 
     switch (type) {
       case 'numeric':
@@ -188,6 +203,23 @@ const RecordCard = ({ record }) => {
 
   return (
     <div style={cardStyle}>
+      <div
+        onClick={(e) => handleCardClick(e, titleId)}
+        key={titleId}
+        style={{ ...titleStyle, marginBottom: '12px' }}
+      >
+        {renderField(
+          {
+            id: titleId,
+            field_definition: { name: 'Title' },
+            value: record.title,
+          },
+          titleId,
+          isEditing,
+          fieldsRef,
+          focusedFieldId,
+        )}
+      </div>
       {record.fields.map((field, i) => {
         const fieldId = field.id || field._id
         const uniqueFieldId = `field-${i}-${fieldId}`
