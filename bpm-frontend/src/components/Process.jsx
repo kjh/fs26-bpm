@@ -66,6 +66,7 @@ const Process = ({
           key={record.id}
           record={record}
           updateRecord={updateRecord}
+          phases={process.phases}
         />
       ))}
     </div>

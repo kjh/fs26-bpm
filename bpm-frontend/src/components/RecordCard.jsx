@@ -3,13 +3,15 @@ import EditableTextField from './EditableTextField'
 import EditableTextArea from './EditableTextarea'
 import EditableDateRange from './EditableDateRange'
 import EditableSelectField from './EditableSelectField'
+import EditablePhaseField from './EditablePhaseField'
 
-const RecordCard = ({ record, updateRecord }) => {
+const RecordCard = ({ record, updateRecord, phases }) => {
   const [isEditing, setIsEditing] = useState(false)
   const [focusedFieldId, setFocusedFieldId] = useState(null)
   const fieldsRef = useRef({})
 
   const titleId = `field-title-${record.id}`
+  const phaseId = `field-phase-${record.id}`
 
   const cardStyle = {
     backgroundColor: '#fff',
@@ -68,9 +70,15 @@ const RecordCard = ({ record, updateRecord }) => {
     const updatedRecord = {}
 
     if (updatedValues && updatedValues[titleId] !== undefined) {
-      const updatedtitle = updatedValues[titleId]
+      const updatedTitle = updatedValues[titleId]
       delete updatedValues[titleId]
-      updatedRecord['title'] = updatedtitle
+      updatedRecord['title'] = updatedTitle
+    }
+
+    if (updatedValues && updatedValues[phaseId] !== undefined) {
+      const updatedPhase = updatedValues[phaseId]
+      delete updatedValues[phaseId]
+      updatedRecord['current_phase'] = updatedPhase
     }
 
     if (updatedValues && Object.keys(updatedValues).length > 0) {
@@ -219,6 +227,28 @@ const RecordCard = ({ record, updateRecord }) => {
           fieldsRef,
           focusedFieldId,
         )}
+      </div>
+      <div
+        onClick={(e) => handleCardClick(e, phaseId)}
+        key={phaseId}
+        style={{ ...titleStyle, marginBottom: '12px' }}
+      >
+        <EditablePhaseField
+          isEditing={isEditing}
+          valueStyle={valueStyle}
+          inputType={'select'}
+          field={{
+            id: phaseId,
+            field_definition: {
+              name: 'Phase',
+              options: phases,
+            },
+            value: record.current_phase.id,
+          }}
+          uniqueFieldId={phaseId}
+          fieldsRef={fieldsRef}
+          focusedFieldId={focusedFieldId}
+        />
       </div>
       {record.fields.map((field, i) => {
         const fieldId = field.id || field._id

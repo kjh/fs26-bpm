@@ -9,11 +9,12 @@ recordsRouter.put('/:id', async (request, response, next) => {
     const processId = request.params.processId
     const updatedFields = request.body?.fields
     const updatedTitle = request.body?.title
+    const updatedPhase = request.body?.current_phase
 
     console.log('processId', processId)
     console.log('recordId', recordId)
 
-    if (!updatedFields && !updatedTitle) {
+    if (!updatedFields && !updatedTitle && !updatedPhase) {
       return response.status(204).send()
     }
 
@@ -24,6 +25,7 @@ recordsRouter.put('/:id', async (request, response, next) => {
 
     const record = await Record.findById(recordId)
     console.log('updatedTitle', updatedTitle)
+    console.log('updatedPhase', updatedPhase)
     console.log('updatedFields', updatedFields)
     console.log('record.fields', record.fields)
 
@@ -47,6 +49,11 @@ recordsRouter.put('/:id', async (request, response, next) => {
     if (updatedTitle) {
       record.title = updatedTitle
       record.markModified('title')
+    }
+
+    if (updatedPhase) {
+      record.current_phase = updatedPhase
+      record.markModified('current_phase')
     }
 
     const savedRecord = await record.save()
