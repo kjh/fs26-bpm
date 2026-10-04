@@ -81,7 +81,7 @@ const RecordCard = ({ record, updateRecord }) => {
   }
 
   const renderField = (field, uniqueFieldId, isEditing) => {
-    const type = field.field_definition?.type || 'text'
+    const type = field.field_definition.type
 
     switch (type) {
       case 'numeric':
@@ -211,7 +211,7 @@ const RecordCard = ({ record, updateRecord }) => {
         {renderField(
           {
             id: titleId,
-            field_definition: { name: 'Title' },
+            field_definition: { name: 'Title', type: 'text' },
             value: record.title,
           },
           titleId,
