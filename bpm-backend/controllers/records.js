@@ -24,10 +24,10 @@ recordsRouter.put('/:id', async (request, response, next) => {
     }
 
     const record = await Record.findById(recordId)
-    console.log('updatedTitle', updatedTitle)
-    console.log('updatedPhase', updatedPhase)
-    console.log('updatedFields', updatedFields)
-    console.log('record.fields', record.fields)
+    console.log('from request updatedTitle', updatedTitle)
+    console.log('from request updatedPhase', updatedPhase)
+    console.log('from request updatedFields', updatedFields)
+    console.log('from db record.fields', record.fields)
 
     if (updatedFields) {
       record.fields = record.fields.map((field) => {
@@ -73,10 +73,17 @@ recordsRouter.put('/:id', async (request, response, next) => {
       },
       {
         path: 'fields.field_definition',
-        select: 'name type options _id',
+        select: 'name type phases options _id',
+        populate: {
+          path: 'phases',
+          select: 'name _id',
+        },
       },
     ])
-
+    console.log(
+      'recordsRouter put response: ',
+      JSON.stringify(savedRecord, null, 2),
+    )
     response.status(200).json(savedRecord)
   } catch (error) {
     next(error)
@@ -89,6 +96,7 @@ recordsRouter.post('/', async (request, response, next) => {
     const { processId } = request.params
 
     console.log('processId', processId)
+    console.log('===')
 
     const processExists = await Process.exists({ _id: processId })
     if (!processExists) {
@@ -112,7 +120,11 @@ recordsRouter.post('/', async (request, response, next) => {
       },
       {
         path: 'fields.field_definition',
-        select: 'name type options',
+        select: 'name type phases options',
+        populate: {
+          path: 'phases',
+          select: 'name _id',
+        },
       },
     ])
     response.status(201).json(savedRecord)
@@ -131,9 +143,16 @@ recordsRouter.get('/', async (request, response, next) => {
       .populate('current_phase', { name: 1 })
       .populate({
         path: 'fields.field_definition',
-        select: 'name type options _id',
+        select: 'name type phases options _id',
+        populate: {
+          path: 'phases',
+          select: 'name _id',
+        },
       })
-    console.log('got records', records)
+    console.log(
+      'recordsRouter get response: ',
+      JSON.stringify(records, null, 2),
+    )
     response.json(records)
   } catch (error) {
     next(error)
