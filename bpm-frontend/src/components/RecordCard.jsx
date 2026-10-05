@@ -6,8 +6,10 @@ import EditableSelectField from './EditableSelectField'
 import EditablePhaseField from './EditablePhaseField'
 
 const RecordCard = ({ record, updateRecord, phases }) => {
+  const [resetKey, setResetKey] = useState(0)
   const [isEditing, setIsEditing] = useState(false)
   const [focusedFieldId, setFocusedFieldId] = useState(null)
+  const [changedPhase, setChangedPhase] = useState(null)
   const fieldsRef = useRef({})
 
   const titleId = `field-title-${record.id}`
@@ -65,7 +67,7 @@ const RecordCard = ({ record, updateRecord, phases }) => {
     e.stopPropagation()
 
     const updatedValues = fieldsRef.current
-    console.log('Arvot', updatedValues)
+    console.log('Arvot (updatedValues) fieldsRef.current', updatedValues)
 
     const updatedRecord = {}
 
@@ -77,15 +79,35 @@ const RecordCard = ({ record, updateRecord, phases }) => {
 
     if (updatedValues && updatedValues[phaseId] !== undefined) {
       const updatedPhase = updatedValues[phaseId]
+      //record
+      console.log('-phase change-')
+      console.log('record current phase name', record.current_phase?.name)
+      console.log('record current phase id', record.current_phase?.id)
+      console.log('record phase changed to id', updatedValues[phaseId])
       delete updatedValues[phaseId]
       updatedRecord['current_phase'] = updatedPhase
+      setChangedPhase(updatedRecord['current_phase'])
+      // ei vielä tallenneta
+      return
+    } else if (changedPhase) {
+      updatedRecord['current_phase'] = changedPhase
+      setChangedPhase(null)
     }
 
     if (updatedValues && Object.keys(updatedValues).length > 0) {
       updatedRecord['fields'] = updatedValues
     }
+
     updateRecord(record.process.id, record.id, updatedRecord)
     setIsEditing(false)
+  }
+
+  const handleCancel = async (e) => {
+    e.preventDefault()
+    e.stopPropagation()
+    setChangedPhase(null)
+    setIsEditing(false)
+    setResetKey((prev) => prev + 1)
   }
 
   const renderField = (field, uniqueFieldId, isEditing) => {
@@ -210,7 +232,7 @@ const RecordCard = ({ record, updateRecord, phases }) => {
   }
 
   return (
-    <div style={cardStyle}>
+    <div key={resetKey} style={cardStyle}>
       <div
         onClick={(e) => handleCardClick(e, titleId)}
         key={titleId}
@@ -250,33 +272,46 @@ const RecordCard = ({ record, updateRecord, phases }) => {
           focusedFieldId={focusedFieldId}
         />
       </div>
-      {record.fields.map((field, i) => {
-        const fieldId = field.id || field._id
-        const uniqueFieldId = `field-${i}-${fieldId}`
-
-        return (
-          <div
-            onClick={(e) => handleCardClick(e, uniqueFieldId)}
-            key={uniqueFieldId}
-            style={{ marginBottom: '12px' }}
-          >
-            {renderField(
-              field,
-              uniqueFieldId,
-              isEditing,
-              fieldsRef,
-              focusedFieldId,
-            )}
-          </div>
-        )
-      })}
+      {record.fields
+        .filter((field) => {
+          if (!field.field_definition?.phases || !record.current_phase?.id) {
+            return false
+          }
+          const isNotFiltered = field.field_definition.phases.some(
+            (element) =>
+              String(element.id || element._id) ===
+              (changedPhase
+                ? changedPhase
+                : String(record.current_phase.id || record.current_phase._id)),
+          )
+          return isNotFiltered
+        })
+        .map((field, i) => {
+          const fieldId = field.id || field._id
+          const uniqueFieldId = `field-${i}-${fieldId}`
+          return (
+            <div
+              onClick={(e) => handleCardClick(e, uniqueFieldId)}
+              key={uniqueFieldId}
+              style={{ marginBottom: '12px' }}
+            >
+              {renderField(
+                field,
+                uniqueFieldId,
+                isEditing,
+                fieldsRef,
+                focusedFieldId,
+              )}
+            </div>
+          )
+        })}
 
       {isEditing && (
         <div onClick={(e) => e.stopPropagation()}>
           <button type="button" onClick={handleSave}>
             Save
           </button>
-          <button type="button" onClick={() => setIsEditing(false)}>
+          <button type="button" onClick={handleCancel}>
             Cancel
           </button>
         </div>

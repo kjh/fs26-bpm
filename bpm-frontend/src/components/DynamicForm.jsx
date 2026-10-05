@@ -7,6 +7,7 @@ import { fi } from 'date-fns/locale/fi'
 registerLocale('fi', fi)
 
 const DynamicForm = ({ phases, addRecord, process_id, phase_id, fields }) => {
+  console.log('DynamicForm fields: ', JSON.stringify(fields, null, 2))
   const cardStyle = {
     backgroundColor: '#fff',
     border: '1px solid #000',
@@ -301,17 +302,29 @@ const DynamicForm = ({ phases, addRecord, process_id, phase_id, fields }) => {
             </select>
           </label>
         </div>
-        {fields.map((field) => {
-          const uniqueFieldId = `field-${field.id}`
-          return (
-            <div key={field.id} style={fieldGroupStyle}>
-              <label htmlFor={uniqueFieldId} style={labelStyle}>
-                {field.name}
-              </label>
-              {renderField(field, uniqueFieldId)}
-            </div>
-          )
-        })}
+        {fields
+          .filter((field) => {
+            if (!field?.phases || !formData['current_phase']) {
+              return false
+            }
+            const isFiltered = field.phases.some(
+              (element) =>
+                String(element.id || element._id) ===
+                String(formData['current_phase']),
+            )
+            return isFiltered
+          })
+          .map((field) => {
+            const uniqueFieldId = `field-${field.id}`
+            return (
+              <div key={field.id} style={fieldGroupStyle}>
+                <label htmlFor={uniqueFieldId} style={labelStyle}>
+                  {field.name}
+                </label>
+                {renderField(field, uniqueFieldId)}
+              </div>
+            )
+          })}
 
         <button type="submit">save record</button>
       </form>
