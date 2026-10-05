@@ -307,12 +307,12 @@ const DynamicForm = ({ phases, addRecord, process_id, phase_id, fields }) => {
             if (!field?.phases || !formData['current_phase']) {
               return false
             }
-            const isFiltered = field.phases.some(
+            const isNotFiltered = field.phases.some(
               (element) =>
                 String(element.id || element._id) ===
                 String(formData['current_phase']),
             )
-            return isFiltered
+            return isNotFiltered
           })
           .map((field) => {
             const uniqueFieldId = `field-${field.id}`
