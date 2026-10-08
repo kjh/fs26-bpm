@@ -91,6 +91,7 @@ const App = () => {
   }
 
   const updateRecord = async (processId, recordId, recordObject) => {
+    console.log('--updateRecord--')
     console.log('processId', processId)
     console.log('recordId', recordId)
     console.log('updateRecord recordObject', recordObject)

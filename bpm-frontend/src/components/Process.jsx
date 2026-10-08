@@ -18,8 +18,6 @@ const Process = ({
     return null
   }
 
-  console.log('records', records)
-
   const handleDelete = () => {
     if (window.confirm(`Delete process "${process.name}"?`)) {
       deleteProcess(id)

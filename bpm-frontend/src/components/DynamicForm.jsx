@@ -7,7 +7,6 @@ import { fi } from 'date-fns/locale/fi'
 registerLocale('fi', fi)
 
 const DynamicForm = ({ phases, addRecord, process_id, phase_id, fields }) => {
-  console.log('DynamicForm fields: ', JSON.stringify(fields, null, 2))
   const cardStyle = {
     backgroundColor: '#fff',
     border: '1px solid #000',
@@ -35,7 +34,7 @@ const DynamicForm = ({ phases, addRecord, process_id, phase_id, fields }) => {
     const initialState = {
       process_id,
       title: '',
-      current_phase: phase_id, // luotaessa vain ensimmäinen vaihe sallittu
+      current_phase: phase_id,
       fields: {}, // aluksi object
     }
 
@@ -51,9 +50,6 @@ const DynamicForm = ({ phases, addRecord, process_id, phase_id, fields }) => {
       }
     })
 
-    console.log('form data initial state', initialState)
-    console.log('fields', fields)
-    console.log('phases', phases)
     return initialState
   }
 
@@ -78,9 +74,6 @@ const DynamicForm = ({ phases, addRecord, process_id, phase_id, fields }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault()
-    console.log('handle submit')
-    console.log('fields from process', fields)
-    console.log('form data', formData)
 
     // luodaan array
     const formattedFields = Object.entries(formData.fields).map(
@@ -99,13 +92,12 @@ const DynamicForm = ({ phases, addRecord, process_id, phase_id, fields }) => {
       fields: formattedFields,
     }
 
-    console.log('newRecord payload', newRecord)
+    console.log('Lähetetään', newRecord)
     createRecord(newRecord)
   }
 
   const createRecord = async (record) => {
-    const createdRecord = await addRecord(record)
-    console.log('createdRecord', createdRecord)
+    await addRecord(record)
     setFormData(setInitialState)
   }
 

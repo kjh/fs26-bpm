@@ -1,18 +1,25 @@
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import EditableTextField from './EditableTextField'
 import EditableTextArea from './EditableTextarea'
 import EditableDateRange from './EditableDateRange'
 import EditableSelectField from './EditableSelectField'
 import EditablePhaseField from './EditablePhaseField'
 
-const RecordCard = ({ record, updateRecord, phases }) => {
+const RecordCard = ({ record: recordProp, updateRecord, phases }) => {
+  const [record, setRecord] = useState(recordProp)
+
   const [resetKey, setResetKey] = useState(0)
   const [isEditing, setIsEditing] = useState(false)
   const [focusedFieldId, setFocusedFieldId] = useState(null)
   const [changedPhase, setChangedPhase] = useState(null)
+
   const fieldsRef = useRef({})
 
-  const titleId = `field-title-${record.id}`
+  useEffect(() => {
+    setRecord(recordProp)
+  }, [recordProp])
+
+  const titleId = `field-title-${record.id}` // field id:n tilalla
   const phaseId = `field-phase-${record.id}`
 
   const cardStyle = {
@@ -31,19 +38,6 @@ const RecordCard = ({ record, updateRecord, phases }) => {
     color: '#000',
   }
 
-  const fieldGroupStyle = {
-    display: 'flex',
-    flexDirection: 'column', // nimi ja arvo allekkain
-    gap: '4px',
-    marginBottom: '12px',
-  }
-
-  const labelStyle = {
-    fontSize: '0.85rem',
-    color: '#000',
-    fontWeight: 'bold',
-  }
-
   const valueStyle = {
     fontSize: '1rem',
     color: '#000',
@@ -53,12 +47,22 @@ const RecordCard = ({ record, updateRecord, phases }) => {
     border: '1px solid green',
   }
 
+  const handlePhaseChange = (newPhaseId) => {
+    setRecord((prevRecord) => ({
+      ...prevRecord,
+      current_phase: {
+        ...prevRecord?.current_phase,
+        id: newPhaseId,
+      },
+    }))
+
+    setChangedPhase(newPhaseId)
+  }
+
   const handleCardClick = (e, uniqueFieldId) => {
-    console.log('title', record.title)
     if (!isEditing) {
       setIsEditing(true)
       setFocusedFieldId(uniqueFieldId)
-      console.log('focus', focusedFieldId)
     }
   }
 
@@ -66,39 +70,33 @@ const RecordCard = ({ record, updateRecord, phases }) => {
     e.preventDefault()
     e.stopPropagation()
 
-    const updatedValues = fieldsRef.current
-    console.log('Arvot (updatedValues) fieldsRef.current', updatedValues)
+    const updatedValues = { ...fieldsRef.current }
+    console.log('fieldsRef.current', updatedValues)
 
     const updatedRecord = {}
 
     if (updatedValues && updatedValues[titleId] !== undefined) {
-      const updatedTitle = updatedValues[titleId]
-      delete updatedValues[titleId]
-      updatedRecord['title'] = updatedTitle
+      updatedRecord['title'] = updatedValues[titleId]
+      delete updatedValues[titleId] // title ei ole fieldsin alla
     }
 
-    if (updatedValues && updatedValues[phaseId] !== undefined) {
-      const updatedPhase = updatedValues[phaseId]
-      //record
-      console.log('-phase change-')
-      console.log('record current phase name', record.current_phase?.name)
-      console.log('record current phase id', record.current_phase?.id)
-      console.log('record phase changed to id', updatedValues[phaseId])
-      delete updatedValues[phaseId]
-      updatedRecord['current_phase'] = updatedPhase
-      setChangedPhase(updatedRecord['current_phase'])
-      // ei vielä tallenneta
-      return
-    } else if (changedPhase) {
+    if (changedPhase) {
+      // ei riipu fieldsRefin arvosta
+      console.log('Lisätään changedPhase', changedPhase)
       updatedRecord['current_phase'] = changedPhase
       setChangedPhase(null)
     }
 
     if (updatedValues && Object.keys(updatedValues).length > 0) {
-      updatedRecord['fields'] = updatedValues
+      updatedRecord['fields'] = updatedValues // fields
     }
 
-    updateRecord(record.process.id, record.id, updatedRecord)
+    if (Object.keys(updatedRecord).length > 0) {
+      console.log('Lähetetään: ', updatedRecord)
+      await updateRecord(record.process.id, record.id, updatedRecord)
+    } else {
+      console.log('Ei muutoksia')
+    }
     setIsEditing(false)
   }
 
@@ -208,7 +206,6 @@ const RecordCard = ({ record, updateRecord, phases }) => {
           <EditableSelectField
             isEditing={isEditing}
             valueStyle={valueStyle}
-            inputType={'select'}
             field={field}
             uniqueFieldId={uniqueFieldId}
             fieldsRef={fieldsRef}
@@ -258,7 +255,6 @@ const RecordCard = ({ record, updateRecord, phases }) => {
         <EditablePhaseField
           isEditing={isEditing}
           valueStyle={valueStyle}
-          inputType={'select'}
           field={{
             id: phaseId,
             field_definition: {
@@ -268,8 +264,8 @@ const RecordCard = ({ record, updateRecord, phases }) => {
             value: record.current_phase.id,
           }}
           uniqueFieldId={phaseId}
-          fieldsRef={fieldsRef}
           focusedFieldId={focusedFieldId}
+          handlePhaseChange={handlePhaseChange}
         />
       </div>
       {record.fields

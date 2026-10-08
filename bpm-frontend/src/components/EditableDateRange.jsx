@@ -33,16 +33,14 @@ const EditableDateRange = ({
   const fieldId = field._id || field.id
 
   useEffect(() => {
-    if (isEditing && fieldsRef && fieldsRef.current) {
-      const originalValue = field.value || '' // propsista
+    if (!fieldsRef || !fieldsRef.current) return
 
-      if (value !== originalValue) {
-        // onko muuttunut
-        fieldsRef.current[fieldId] = value
-        console.log('Uusi arvo:', value)
-      } else {
-        delete fieldsRef.current[fieldId]
-      }
+    const originalValue = field.value
+
+    if (isEditing && value !== originalValue) {
+      fieldsRef.current[fieldId] = value
+    } else {
+      delete fieldsRef.current[fieldId]
     }
 
     return () => {

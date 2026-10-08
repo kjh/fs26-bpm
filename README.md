@@ -1,9 +1,11 @@
 # Full Stack -websovelluskehitys harjoitustyö
 
-## Työn aihe: 
-Liiketoimintaprosessien hallintatyökalu 
+## Työn aihe:
 
-## Kuvaus: 
+Liiketoimintaprosessien hallintatyökalu
+
+## Kuvaus:
+
 Sovelluksen avulla voidaan rakentaa erilaisiin tarpeisiin mukautuva liiketoimintaprosessien hallintatyökalu.
 
 ## Toiminnot:

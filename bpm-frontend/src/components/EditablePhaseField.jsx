@@ -1,40 +1,20 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 
 const EditablePhaseField = ({
   field,
   valueStyle,
-  inputType,
   uniqueFieldId,
   isEditing,
-  fieldsRef,
   focusedFieldId,
+  handlePhaseChange,
 }) => {
   const [value, setValue] = useState(field.value)
   const options = field.field_definition?.options || ['Empty']
-  const fieldId = field._id || field.id
 
-  console.log('alku field.value', field.value)
-  console.log('alku value', value)
-
-  useEffect(() => {
-    if (isEditing && fieldsRef && fieldsRef.current) {
-      const originalValue = field.value || '' // propsista
-
-      if (value !== originalValue) {
-        // onko muuttunut
-        fieldsRef.current[fieldId] = value
-        console.log('Uusi arvo:', value)
-      } else {
-        delete fieldsRef.current[fieldId]
-      }
-    }
-
-    return () => {
-      if (fieldsRef && fieldsRef.current) {
-        delete fieldsRef.current[fieldId]
-      }
-    }
-  }, [value, isEditing, fieldId, fieldsRef, field.value])
+  const handleChange = (e) => {
+    setValue(e.target.value)
+    handlePhaseChange(e.target.value)
+  }
 
   return (
     <>
@@ -57,7 +37,7 @@ const EditablePhaseField = ({
             id={uniqueFieldId}
             name={field._id || field.id}
             value={value}
-            onChange={(e) => setValue(e.target.value)}
+            onChange={(e) => handleChange(e)}
             className="inline-editable-input"
             autoFocus={focusedFieldId === uniqueFieldId}
           >
