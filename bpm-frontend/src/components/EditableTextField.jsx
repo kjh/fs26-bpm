@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { Box, Typography, TextField } from '@mui/material'
 
 const EditableTextField = ({
   field,
@@ -33,57 +34,78 @@ const EditableTextField = ({
   }, [value, isEditing, fieldId, fieldsRef, field.value])
 
   return (
-    <>
+    <Box key={field.id} sx={valueStyle}>
       {isEditing ? (
-        <div key={field.id} style={valueStyle}>
-          <label
-            style={{
+        <Box>
+          <Typography
+            component="label"
+            htmlFor={uniqueFieldId}
+            sx={{
               fontSize: '0.85rem',
               color: '#000',
               fontWeight: 'bold',
               display: 'block',
-              marginBottom: '4px',
+              mb: 0.5,
             }}
-            htmlFor={uniqueFieldId}
           >
             {field.field_definition?.name}
-            {`${inputType === 'number' && unit ? ` (${unit})` : ''}`}
-          </label>
+            {inputType === 'number' && unit ? ` (${unit})` : ''}
+          </Typography>
 
-          <input
+          <TextField
             id={uniqueFieldId}
             name={field._id || field.id}
             type={inputType}
             value={value}
             onChange={(e) => setValue(e.target.value)}
             placeholder="Empty"
-            className="inline-editable-input"
             autoFocus={focusedFieldId === uniqueFieldId}
+            variant="standard"
+            fullWidth
+            slotProps={{
+              input: {
+                disableUnderline: true,
+              },
+            }}
+            sx={{
+              '& .MuiInputBase-input': {
+                padding: '4px 0',
+                fontSize: 'inherit',
+                fontFamily: 'inherit',
+              },
+            }}
           />
-        </div>
+        </Box>
       ) : (
-        <div>
-          <div
-            style={{
+        <Box>
+          <Typography
+            sx={{
               fontSize: '0.85rem',
               color: '#000',
               fontWeight: 'bold',
               display: 'block',
-              marginBottom: '4px',
+              mb: 0.5,
             }}
           >
             {field.field_definition?.name}
-          </div>
+          </Typography>
+
           {value ? (
-            <>
+            <Typography variant="body2">
               {`${String(value)}${inputType === 'number' && unit ? ` ${unit}` : ''}`}
-            </>
+            </Typography>
           ) : (
-            <em>Empty</em>
+            <Typography
+              variant="body2"
+              component="em"
+              sx={{ color: 'text.secondary', fontStyle: 'italic' }}
+            >
+              Empty
+            </Typography>
           )}
-        </div>
+        </Box>
       )}
-    </>
+    </Box>
   )
 }
 

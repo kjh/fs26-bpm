@@ -3,6 +3,7 @@ import { useParams, useNavigate, Link } from 'react-router-dom'
 import RecordCard from './RecordCard'
 import DynamicForm from './DynamicForm'
 import Togglable from './Togglable'
+import KanbanBoard from './KanbanBoard'
 
 const Process = ({
   process,
@@ -13,6 +14,10 @@ const Process = ({
 }) => {
   const id = useParams().id
   const navigate = useNavigate()
+
+  console.log('Top process')
+  console.log('saatiin prosessi: ', process)
+  console.log('saatiin tietueet', records)
 
   if (!process || !records) {
     return null
@@ -28,6 +33,7 @@ const Process = ({
   return (
     <div>
       <Link to={`/processes/${process.id}/records`}>records</Link>
+      <Link to={`/processes/${process.id}/records/kanban`}>kanban</Link>
       <h3>Process: {process.name}</h3>
       <Togglable buttonLabel="Settings">
         <h3>Settings</h3>

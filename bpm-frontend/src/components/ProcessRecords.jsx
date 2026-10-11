@@ -1,6 +1,13 @@
 import DynamicForm from './DynamicForm'
+import KanbanBoard from './KanbanBoard'
 
-const ProcessRecords = ({ addRecord, process }) => {
+const ProcessRecords = ({
+  process,
+  deleteProcess,
+  records,
+  addRecord,
+  updateRecord,
+}) => {
   if (!process) {
     console.log('no process', process)
     return null
@@ -15,6 +22,12 @@ const ProcessRecords = ({ addRecord, process }) => {
         process_id={process.id}
         phase_id={process.phases[0].id}
         fields={process.field_definitions}
+      />
+      <KanbanBoard
+        process={process}
+        deleteProcess={deleteProcess}
+        addRecord={addRecord}
+        updateRecord={updateRecord}
       />
     </div>
   )

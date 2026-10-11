@@ -60,4 +60,9 @@
 |       | 2    | tietueen vaiheen vaihtaminen päivittää kentät ja muokkaamisen peruminen palauttaa arvot |
 | 6.10  | 4    | tietueen vaiheen vaihtaminen vaihtaa automaattisesti kentät (ilman save nappia)         |
 | 7.10  | 3    | käyttöliittymän sunnittelua                                                             |
-|  yht  | 142  |                                                                                         |
+| 8.10  | 3    | käyttöliittymän sunnittelua, material ui otettu käyttöön, korjauksia                    | (yht 145)
+| 9.10  | 3    | käyttöliittymän sunnittelua, material ui, kanban näkymä |
+| 10.10 | 7    | material ui, kanban näkymä |
+| 11.10 | 9    | material ui, kanban näkymä, parempi navigaatio, drawerin käyttö |
+|       |      |  |
+|  yht  | 164  |  |

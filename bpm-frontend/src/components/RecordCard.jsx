@@ -5,7 +5,7 @@ import EditableDateRange from './EditableDateRange'
 import EditableSelectField from './EditableSelectField'
 import EditablePhaseField from './EditablePhaseField'
 
-const RecordCard = ({ record: recordProp, updateRecord, phases }) => {
+const RecordCard = ({ record: recordProp, updateRecord, phases, readOnly }) => {
   const [record, setRecord] = useState(recordProp)
 
   const [resetKey, setResetKey] = useState(0)
@@ -24,7 +24,7 @@ const RecordCard = ({ record: recordProp, updateRecord, phases }) => {
 
   const cardStyle = {
     backgroundColor: '#fff',
-    border: '1px solid #000',
+    border: '1px solid #333',
     borderRadius: '16px',
     padding: '16px',
     maxWidth: '350px',
@@ -60,7 +60,7 @@ const RecordCard = ({ record: recordProp, updateRecord, phases }) => {
   }
 
   const handleCardClick = (e, uniqueFieldId) => {
-    if (!isEditing) {
+    if (!readOnly && !isEditing) {
       setIsEditing(true)
       setFocusedFieldId(uniqueFieldId)
     }
@@ -103,6 +103,7 @@ const RecordCard = ({ record: recordProp, updateRecord, phases }) => {
   const handleCancel = async (e) => {
     e.preventDefault()
     e.stopPropagation()
+    setRecord(recordProp)
     setChangedPhase(null)
     setIsEditing(false)
     setResetKey((prev) => prev + 1)

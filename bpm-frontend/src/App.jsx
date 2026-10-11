@@ -8,23 +8,31 @@ import {
   removePersistentUser,
 } from './services/persistentUser'
 
-import { Routes, Route, Link, useMatch } from 'react-router-dom'
+import { Routes, Route, useMatch } from 'react-router-dom'
+
+import { Box, Container, CssBaseline } from '@mui/material'
 
 import ProcessList from './components/ProcessList'
 import ProcessRecords from './components/ProcessRecords'
 import Home from './components/Home'
-import Footer from './components/Footer'
 import ProcessForm from './components/ProcessForm'
 import Process from './components/Process'
 import LoginForm from './components/LoginForm'
 import Notification from './components/Notification'
+import TopAppBar from './components/TopAppBar'
+import KanbanBoard from './components/KanbanBoard'
+import AddRecordDrawer from './components/AddRecordDrawer'
+import TopBreadcrumb from './components/TopBreadcrumb'
 
 const App = () => {
   const [processes, setProcesses] = useState([])
   const [records, setRecords] = useState([])
-
-  const [errorMessage, setErrorMessage] = useState(null)
+  const [notificationMessage, setNotificationMessage] = useState(null)
   const [user, setUser] = useState(null)
+
+  const [isAddingNewRecord, setIsAddingNewRecord] = useState(null)
+  const handleCloseNew = () => setIsAddingNewRecord(null)
+  const handleAddNew = () => setIsAddingNewRecord(true)
 
   useEffect(() => {
     const storedUser = getPersistentUser()
@@ -41,10 +49,17 @@ const App = () => {
       try {
         const initialProcesses = await processService.getAll()
         setProcesses(initialProcesses)
-      } catch (error) {
-        setErrorMessage('error loading processes', error)
+        setNotificationMessage({ message: 'loaded processes', type: 'info' })
         setTimeout(() => {
-          setErrorMessage(null)
+          setNotificationMessage(null)
+        }, 5000)
+      } catch (error) {
+        setNotificationMessage({
+          message: 'error loading processes',
+          type: 'error',
+        })
+        setTimeout(() => {
+          setNotificationMessage(null)
         }, 5000)
       }
     }
@@ -59,10 +74,17 @@ const App = () => {
       processService.setToken(authenticatedUser.token)
       recordService.setToken(authenticatedUser.token)
       setUser(authenticatedUser)
-    } catch (error) {
-      setErrorMessage('wrong credentials', error)
+      setNotificationMessage({
+        message: `Welcome ${authenticatedUser.name}`,
+        type: 'info',
+      })
       setTimeout(() => {
-        setErrorMessage(null)
+        setNotificationMessage(null)
+      }, 5000)
+    } catch (error) {
+      setNotificationMessage({ message: 'wrong credentials', type: 'error' })
+      setTimeout(() => {
+        setNotificationMessage(null)
       }, 5000)
     }
   }
@@ -91,16 +113,11 @@ const App = () => {
   }
 
   const updateRecord = async (processId, recordId, recordObject) => {
-    console.log('--updateRecord--')
-    console.log('processId', processId)
-    console.log('recordId', recordId)
-    console.log('updateRecord recordObject', recordObject)
     const updatedRecord = await recordService.update(
       processId,
       recordId,
       recordObject,
     )
-    console.log('updateRecord returns', updatedRecord)
 
     setRecords((previousRecords) =>
       previousRecords.map((record) =>
@@ -117,23 +134,18 @@ const App = () => {
     })
   }
 
-  const padding = {
-    padding: 5,
-  }
-
   const match = useMatch('/processes/:id/*')
-
-  console.log('match', match)
 
   const process = match
     ? processes.find((process) => process.id === match.params.id)
     : null
 
-  console.log('current process', process)
+  console.log('APP current process', process)
 
   useEffect(() => {
+    console.log('process changed..')
     if (process) {
-      console.log('loading records..')
+      console.log('loading records...')
       recordService.getAll(process.id).then((initialRecords) => {
         setRecords(initialRecords)
         console.log('records loaded', initialRecords)
@@ -145,60 +157,83 @@ const App = () => {
     return (
       <div>
         <h1>BPM App</h1>
-        <Notification message={errorMessage} />
+        <Notification message={notificationMessage} />
         <LoginForm handleLogin={handleLogin} />
       </div>
     )
   }
-
   return (
-    <div>
-      <div>
-        <Link style={padding} to="/">
-          home
-        </Link>
-        <Link style={padding} to="/processes">
-          processes
-        </Link>
-        <Link style={padding} to="/create">
-          new process
-        </Link>
+    <>
+      <CssBaseline />
+      <Box sx={{ flexGrow: 1, backgroundColor: '#f8f8f8' }}>
+        <TopAppBar
+          user={user}
+          handleLogout={handleLogout}
+          handleAddNew={handleAddNew}
+          processId={process?.id}
+        />
+        <TopBreadcrumb process={process} />
 
-        {user && <button onClick={handleLogout}>logout</button>}
-      </div>
+        <Notification notification={notificationMessage} />
 
-      <Notification message={errorMessage} />
-
-      <Routes>
-        <Route
-          path="/processes/:id"
-          element={
-            <Process
-              process={process}
-              deleteProcess={deleteProcess}
-              records={records}
-              addRecord={addRecord}
-              updateRecord={updateRecord}
+        <Container maxWidth="xl" sx={{ mt: 1 }}>
+          <Routes>
+            <Route
+              path="/processes/:id"
+              element={
+                <Process
+                  process={process}
+                  deleteProcess={deleteProcess}
+                  records={records}
+                  addRecord={addRecord}
+                  updateRecord={updateRecord}
+                />
+              }
             />
-          }
-        />
-        <Route
-          path="/processes/:id/records"
-          element={<ProcessRecords addRecord={addRecord} process={process} />}
-        />
-        <Route
-          path="/processes"
-          element={<ProcessList processes={processes} />}
-        />
-        <Route
-          path="/create"
-          element={<ProcessForm createProcess={addProcess} />}
-        />
-        <Route path="/" element={<Home />} />
-      </Routes>
+            <Route
+              path="/processes/:id/records"
+              element={
+                <ProcessRecords
+                  process={process}
+                  deleteProcess={deleteProcess}
+                  records={records}
+                  addRecord={addRecord}
+                  updateRecord={updateRecord}
+                />
+              }
+            />
+            <Route
+              path="/processes/:id/records/kanban"
+              element={
+                <KanbanBoard
+                  process={process}
+                  deleteProcess={deleteProcess}
+                  addRecord={addRecord}
+                  updateRecord={updateRecord}
+                  records={records}
+                />
+              }
+            />
+            <Route
+              path="/processes"
+              element={<ProcessList processes={processes} />}
+            />
+            <Route
+              path="/create"
+              element={<ProcessForm createProcess={addProcess} />}
+            />
+            <Route path="/" element={<Home />} />
+          </Routes>
 
-      <Footer />
-    </div>
+          <AddRecordDrawer
+            process={process}
+            addRecord={addRecord}
+            isAddingNewRecord={isAddingNewRecord}
+            handleCloseNew={handleCloseNew}
+          />
+        </Container>
+      </Box>
+    </>
   )
 }
 
