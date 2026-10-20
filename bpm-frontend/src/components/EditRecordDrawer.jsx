@@ -4,10 +4,16 @@ import RecordCard from './RecordCard'
 
 const EditRecordDrawer = ({
   process,
+  deleteRecord,
   selectedRecord,
+  setSelectedRecord,
   handleClose,
   updateRecord,
 }) => {
+  const handleDeleteRecord = () => {
+    deleteRecord(process.id, selectedRecord.id)
+    setSelectedRecord(null)
+  }
   return (
     <Drawer
       anchor="right"
@@ -59,7 +65,7 @@ const EditRecordDrawer = ({
             }}
           >
             <Typography variant="subtitle2" color="text.secondary">
-              ID: {selectedRecord.id}
+              Click to edit fields
             </Typography>
             <RecordCard
               record={selectedRecord}
@@ -85,6 +91,14 @@ const EditRecordDrawer = ({
             onClick={handleClose}
           >
             Close
+          </Button>
+          <Button
+            variant="outlined"
+            color="inherit"
+            fullWidth
+            onClick={() => handleDeleteRecord()}
+          >
+            Delete record
           </Button>
         </Box>
       </Box>

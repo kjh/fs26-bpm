@@ -20,7 +20,6 @@ const TopBreadcrumb = ({ process }) => {
       aria-label="breadcrumb"
       sx={{ mx: 2 }}
     >
-      {/* 1. Koti-linkki */}
       <Link
         component={RouterLink}
         underline="hover"
@@ -52,17 +51,6 @@ const TopBreadcrumb = ({ process }) => {
           sx={{ fontSize: '0.875rem', '&:hover': { color: '#009a67' } }}
         >
           {process?.name || 'process name'}
-        </Link>
-      )}
-      {matchKanban && (
-        <Link
-          component={RouterLink}
-          underline="hover"
-          color="text.secondary"
-          to={`/processes/${process?.id || ''}/records`}
-          sx={{ fontSize: '0.875rem', '&:hover': { color: '#009a67' } }}
-        >
-          {'records'}
         </Link>
       )}
       {matchKanban && (

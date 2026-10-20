@@ -1,25 +1,27 @@
-import { useParams, useNavigate, Link } from 'react-router-dom'
+import { useParams, useNavigate, Link as RouterLink } from 'react-router-dom'
 
-import RecordCard from './RecordCard'
-import DynamicForm from './DynamicForm'
-import Togglable from './Togglable'
-import KanbanBoard from './KanbanBoard'
+import {
+  Box,
+  Button,
+  Typography,
+  List,
+  ListItem,
+  ListItemText,
+  Divider,
+  Stack,
+  Paper,
+  Chip,
+} from '@mui/material'
+import EditIcon from '@mui/icons-material/Edit'
+import DeleteIcon from '@mui/icons-material/Delete'
 
-const Process = ({
-  process,
-  deleteProcess,
-  records,
-  addRecord,
-  updateRecord,
-}) => {
+const Process = ({ process, deleteProcess }) => {
   const id = useParams().id
   const navigate = useNavigate()
 
   console.log('Top process')
-  console.log('saatiin prosessi: ', process)
-  console.log('saatiin tietueet', records)
 
-  if (!process || !records) {
+  if (!process) {
     return null
   }
 
@@ -31,49 +33,132 @@ const Process = ({
   }
 
   return (
-    <div>
-      <Link to={`/processes/${process.id}/records`}>records</Link>
-      <Link to={`/processes/${process.id}/records/kanban`}>kanban</Link>
-      <h3>Process: {process.name}</h3>
-      <Togglable buttonLabel="Settings">
-        <h3>Settings</h3>
-        <button onClick={handleDelete}>delete</button>
-        <h3>Phases</h3>
-        <ul>
+    <Box sx={{ maxWidth: 600, mx: 'auto', p: 3 }}>
+      <Typography
+        variant="h3"
+        sx={{
+          fontWeight: 'bold',
+          width: '100%',
+          color: '#424242',
+        }}
+      >
+        Process: {process.name}
+      </Typography>
+      <Divider sx={{ my: 3 }} />
+      <Button
+        component={RouterLink}
+        to={`/processes/${process.id}/records/kanban`}
+        variant="contained"
+        sx={{ mb: 4 }}
+      >
+        Kanban view
+      </Button>
+
+      <Box sx={{ mb: 4 }}>
+        <Typography
+          variant="h6"
+          component="h2"
+          gutterBottom
+          color="text.secondary"
+        >
+          Settings
+        </Typography>
+        <Stack direction="row" spacing={2} sx={{ mt: 1 }}>
+          <Button
+            component={RouterLink}
+            to={`/processes/${process.id}/edit`}
+            variant="outlined"
+            startIcon={<EditIcon />}
+            size="small"
+          >
+            Edit
+          </Button>
+          <Button
+            onClick={handleDelete}
+            variant="outlined"
+            color="error"
+            startIcon={<DeleteIcon />}
+            size="small"
+          >
+            Delete
+          </Button>
+        </Stack>
+      </Box>
+
+      <Box sx={{ mb: 4 }}>
+        <Typography
+          variant="h6"
+          component="h3"
+          gutterBottom
+          color="text.secondary"
+        >
+          Phases
+        </Typography>
+        <List component="ol" sx={{ listStyleType: 'decimal', pl: 3 }}>
           {process.phases.map((phase) => (
-            <li key={phase.id}>{phase.name}</li>
+            <ListItem key={phase.id} sx={{ display: 'list-item', py: 0.5 }}>
+              <ListItemText primary={phase.name} />
+            </ListItem>
           ))}
-        </ul>
-        <h3>Field definitions</h3>
-        <div>
+        </List>
+      </Box>
+
+      <Box>
+        <Typography
+          variant="h6"
+          component="h3"
+          gutterBottom
+          color="text.secondary"
+        >
+          Field definitions
+        </Typography>
+        <Stack spacing={2} sx={{ mt: 1 }}>
           {process.field_definitions.map((field) => (
-            <div style={{ display: 'flex', gap: '8px' }} key={field.id}>
-              {field.name} - {field.type} -{' '}
-              {field.phases.flatMap((p) => p.name).join(', ')}
-            </div>
+            <Paper
+              key={field.id}
+              variant="outlined"
+              sx={{ p: 2, bgcolor: 'background.default' }}
+            >
+              <Stack direction="row" spacing={3} sx={{ mb: 1.5 }}>
+                <Typography variant="body1">
+                  <strong>Name:</strong> {field.name}
+                </Typography>
+                <Chip
+                  label={field.type}
+                  size="small"
+                  variant="outlined"
+                  color="primary"
+                />
+              </Stack>
+
+              {field.phases && field.phases.length > 0 && (
+                <Box>
+                  <Typography
+                    variant="caption"
+                    color="text.secondary"
+                    display="block"
+                    sx={{ mb: 0.5 }}
+                  >
+                    Used in phases:
+                  </Typography>
+                  <Stack direction="row" spacing={1} useFlexGap>
+                    {field.phases.map((p) => (
+                      <Chip
+                        key={p.id}
+                        label={p.name}
+                        size="small"
+                        color="default"
+                        sx={{ fontSize: '0.75rem' }}
+                      />
+                    ))}
+                  </Stack>
+                </Box>
+              )}
+            </Paper>
           ))}
-        </div>
-      </Togglable>
-      <Togglable buttonLabel="Add record">
-        <h3>Add record</h3>
-        <DynamicForm
-          phases={process.phases}
-          addRecord={addRecord}
-          process_id={process.id}
-          phase_id={process.phases[0].id}
-          fields={process.field_definitions}
-        />
-      </Togglable>
-      <h3>Records</h3>
-      {records.map((record) => (
-        <RecordCard
-          key={record.id}
-          record={record}
-          updateRecord={updateRecord}
-          phases={process.phases}
-        />
-      ))}
-    </div>
+        </Stack>
+      </Box>
+    </Box>
   )
 }
 

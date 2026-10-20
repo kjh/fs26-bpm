@@ -84,17 +84,13 @@ const EditableDateRange = ({
 
               if (startUpdate && endUpdate) {
                 setIsEditingRange(false)
-              } /*else if (!startUpdate && !endUpdate) {
-              setIsEditing(false) // isClearable 
-            }*/
+              }
 
               setValue(fieldStr)
             }}
-            //open={true}
             onClickOutside={() => setIsEditingRange(false)}
             shouldCloseOnSelect={false}
             style={{ width: 'auto' }}
-            //isClearable={true} jos ei pakollinen
             placeholderText="Select date range"
             locale="fi"
             dateFormat="dd.MM.yyyy"

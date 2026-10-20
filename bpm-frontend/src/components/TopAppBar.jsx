@@ -32,32 +32,64 @@ const TopAppBar = ({ user, handleLogout, handleAddNew, processId }) => {
             </Button>
 
             {processId ? (
-              <Button
-                onClick={handleAddNew}
-                variant="outlined"
-                color="primary"
-                startIcon={<AddIcon />}
-                sx={{
-                  textTransform: 'none',
-                  fontWeight: 500,
-                  color: '#fff',
-                  borderColor: '#fff',
-                  '& .MuiButton-startIcon': {
-                    marginRight: { xs: 0, sm: 1 },
-                  },
-                  '&:hover': {
-                    borderColor: '#eee',
-                    backgroundColor: 'rgba(255, 255, 255, 0.08)',
-                  },
-                }}
-              >
-                <Box
-                  component="span"
-                  sx={{ display: { xs: 'none', sm: 'inline', color: '#fff' } }}
+              <>
+                <Button
+                  onClick={handleAddNew}
+                  variant="outlined"
+                  color="primary"
+                  startIcon={<AddIcon />}
+                  sx={{
+                    textTransform: 'none',
+                    fontWeight: 500,
+                    color: '#fff',
+                    borderColor: '#fff',
+                    '& .MuiButton-startIcon': {
+                      marginRight: { xs: 0, sm: 1 },
+                    },
+                    '&:hover': {
+                      borderColor: '#eee',
+                      backgroundColor: 'rgba(255, 255, 255, 0.08)',
+                    },
+                  }}
                 >
-                  Add record
-                </Box>
-              </Button>
+                  <Box
+                    component="span"
+                    sx={{
+                      display: { xs: 'none', sm: 'inline', color: '#fff' },
+                    }}
+                  >
+                    Add record
+                  </Box>
+                </Button>
+                <Button
+                  component={RouterLink}
+                  to={`/processes/${processId}/records/kanban`}
+                  variant="outlined"
+                  color="secondary"
+                  sx={{
+                    textTransform: 'none',
+                    fontWeight: 500,
+                    color: '#fff',
+                    borderColor: '#fff',
+                    '& .MuiButton-startIcon': {
+                      marginRight: { xs: 0, sm: 1 },
+                    },
+                    '&:hover': {
+                      borderColor: '#eee',
+                      backgroundColor: 'rgba(255, 255, 255, 0.08)',
+                    },
+                  }}
+                >
+                  <Box
+                    component="span"
+                    sx={{
+                      display: { xs: 'none', sm: 'inline', color: '#fff' },
+                    }}
+                  >
+                    Kanban view
+                  </Box>
+                </Button>
+              </>
             ) : (
               <Button
                 component={RouterLink}

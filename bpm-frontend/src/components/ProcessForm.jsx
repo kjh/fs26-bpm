@@ -6,7 +6,6 @@ const FIELD_CATEGORIES = {
     { value: 'text', label: 'Text' },
     { value: 'predefined', label: 'Predefined Options' },
     { value: 'textarea', label: 'Text Area' },
-    //{ value: "subheader", label: "Subheader (header text field)" }
   ],
   Numeric: [
     { value: 'numeric', label: 'Numeric' },
@@ -16,9 +15,7 @@ const FIELD_CATEGORIES = {
     { value: 'date', label: 'Date' },
     { value: 'date_range', label: 'Date Range' },
     { value: 'time', label: 'Time' },
-    //{ value: "time_range", label: "Time Range" },
     { value: 'datetime', label: 'Date & Time' },
-    //{ value: "datetime_range", label: "Date & Time Range" }
   ],
 }
 
@@ -88,6 +85,8 @@ const ProcessForm = ({ createProcess }) => {
       phases: newPhases,
       field_definitions: newFieldDefinitions,
     })
+
+    if (createdProcess === null) return
 
     setNewProcessName('')
     setNewPhases([])

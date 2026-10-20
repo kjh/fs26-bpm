@@ -29,16 +29,13 @@ const update = async (processId, recordId, updatedObject) => {
   const config = {
     headers: { Authorization: token },
   }
-  console.log(
-    'records service update record',
-    `${baseUrl}/${processId}/records/${recordId}`,
-  )
+
   const response = await axios.put(
     `${baseUrl}/${processId}/records/${recordId}`,
     updatedObject,
     config,
   )
-  console.log('records service update record READY')
+
   return response.data
 }
 

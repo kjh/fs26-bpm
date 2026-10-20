@@ -19,7 +19,7 @@ const RecordCard = ({ record: recordProp, updateRecord, phases, readOnly }) => {
     setRecord(recordProp)
   }, [recordProp])
 
-  const titleId = `field-title-${record.id}` // field id:n tilalla
+  const titleId = `field-title-${record.id}`
   const phaseId = `field-phase-${record.id}`
 
   const cardStyle = {
@@ -77,12 +77,11 @@ const RecordCard = ({ record: recordProp, updateRecord, phases, readOnly }) => {
 
     if (updatedValues && updatedValues[titleId] !== undefined) {
       updatedRecord['title'] = updatedValues[titleId]
-      delete updatedValues[titleId] // title ei ole fieldsin alla
+      delete updatedValues[titleId]
     }
 
     if (changedPhase) {
       // ei riipu fieldsRefin arvosta
-      console.log('Lisätään changedPhase', changedPhase)
       updatedRecord['current_phase'] = changedPhase
       setChangedPhase(null)
     }
@@ -92,10 +91,10 @@ const RecordCard = ({ record: recordProp, updateRecord, phases, readOnly }) => {
     }
 
     if (Object.keys(updatedRecord).length > 0) {
-      console.log('Lähetetään: ', updatedRecord)
+      console.log('Sending: ', updatedRecord)
       await updateRecord(record.process.id, record.id, updatedRecord)
     } else {
-      console.log('Ei muutoksia')
+      console.log('No changes')
     }
     setIsEditing(false)
   }
@@ -105,8 +104,8 @@ const RecordCard = ({ record: recordProp, updateRecord, phases, readOnly }) => {
     e.stopPropagation()
     setRecord(recordProp)
     setChangedPhase(null)
-    setIsEditing(false)
     setResetKey((prev) => prev + 1)
+    setIsEditing(false)
   }
 
   const renderField = (field, uniqueFieldId, isEditing) => {
