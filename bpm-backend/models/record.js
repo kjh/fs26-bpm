@@ -1,37 +1,38 @@
 const mongoose = require('mongoose')
 
-const recordSchema = new mongoose.Schema({
-  process: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Process',
-    //required: true
-  },
-
-  title: {
-    type: String,
-    //required: true
-  },
-
-  current_phase: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Phase',
-    //required: true
-  },
-
-  fields: [
-    {
-      //_id: false,
-      field_definition: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'FieldDefinition',
-        //required: true
-      },
-      value: {
-        type: mongoose.Schema.Types.Mixed,
-      },
+const recordSchema = new mongoose.Schema(
+  {
+    process: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Process',
+      required: true,
     },
-  ],
-})
+
+    title: {
+      type: String,
+    },
+
+    current_phase: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Phase',
+    },
+
+    fields: [
+      {
+        field_definition: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: 'FieldDefinition',
+        },
+        value: {
+          type: mongoose.Schema.Types.Mixed,
+        },
+      },
+    ],
+  },
+  {
+    timestamps: true,
+  },
+)
 
 recordSchema.set('toJSON', {
   transform: (document, returnedObject) => {

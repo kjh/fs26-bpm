@@ -3,16 +3,11 @@ const Process = require('../models/process')
 const Record = require('../models/record')
 
 recordsRouter.put('/:id', async (request, response, next) => {
-  console.log('recordsRouter put')
   try {
     const recordId = request.params.id
-    const processId = request.params.processId
     const updatedFields = request.body?.fields
     const updatedTitle = request.body?.title
     const updatedPhase = request.body?.current_phase
-
-    console.log('processId', processId)
-    console.log('recordId', recordId)
 
     if (!updatedFields && !updatedTitle && !updatedPhase) {
       return response.status(204).send()
@@ -24,10 +19,6 @@ recordsRouter.put('/:id', async (request, response, next) => {
     }
 
     const record = await Record.findById(recordId)
-    console.log('from request updatedTitle', updatedTitle)
-    console.log('from request updatedPhase', updatedPhase)
-    console.log('from request updatedFields', updatedFields)
-    console.log('from db record.fields', record.fields)
 
     if (updatedFields) {
       record.fields = record.fields.map((field) => {
@@ -80,10 +71,7 @@ recordsRouter.put('/:id', async (request, response, next) => {
         },
       },
     ])
-    console.log(
-      'recordsRouter put response: ',
-      JSON.stringify(savedRecord, null, 2),
-    )
+
     response.status(200).json(savedRecord)
   } catch (error) {
     next(error)
@@ -91,12 +79,8 @@ recordsRouter.put('/:id', async (request, response, next) => {
 })
 
 recordsRouter.post('/', async (request, response, next) => {
-  console.log('recordsRouter post')
   try {
     const { processId } = request.params
-
-    console.log('processId', processId)
-    console.log('===')
 
     const processExists = await Process.exists({ _id: processId })
     if (!processExists) {
@@ -135,9 +119,7 @@ recordsRouter.post('/', async (request, response, next) => {
 
 recordsRouter.get('/', async (request, response, next) => {
   const { processId } = request.params
-  console.log('records for process id', processId)
   try {
-    console.log('got id', processId)
     const records = await Record.find({ process: processId })
       .populate('process', { name: 1 })
       .populate('current_phase', { name: 1 })
@@ -149,11 +131,24 @@ recordsRouter.get('/', async (request, response, next) => {
           select: 'name _id',
         },
       })
-    console.log(
-      'recordsRouter get response: ',
-      JSON.stringify(records, null, 2),
-    )
     response.json(records)
+  } catch (error) {
+    next(error)
+  }
+})
+
+recordsRouter.delete('/:id', async (request, response, next) => {
+  try {
+    const recordId = request.params.id
+
+    const record = await Record.findById(recordId)
+    if (!record) {
+      return response.status(404).json({ error: 'Record not found' })
+    }
+
+    await Record.findByIdAndDelete(recordId)
+
+    response.status(204).end()
   } catch (error) {
     next(error)
   }

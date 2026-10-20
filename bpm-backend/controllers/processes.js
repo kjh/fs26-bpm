@@ -48,14 +48,15 @@ processesRouter.get('/:id', async (request, response, next) => {
 processesRouter.post('/', async (request, response, next) => {
   const { name, phases, field_definitions } = request.body
 
-  if (!name || name.trim().length < 5) {
+  if (!name || name.trim().length < 2) {
     return response.status(400).json({
       error:
-        'Prosessin nimi on pakollinen ja sen täytyy olla vähintään 5 merkkiä pitkä.',
+        'Prosessin nimi on pakollinen ja sen täytyy olla vähintään 2 merkkiä pitkä.',
     })
   }
 
   try {
+    // vaiheet oikeaan muotoon
     let formattedPhases = []
     if (Array.isArray(phases)) {
       formattedPhases = phases.map((phase) => {
@@ -65,26 +66,32 @@ processesRouter.post('/', async (request, response, next) => {
         return phase
       })
     }
-
+    console.log('formattedPhases', formattedPhases)
+    // tallennetaan uudet vaiheet tietokantaan
     const savedPhases = await Phase.insertMany(formattedPhases, {
       writeConcern: { w: 'majority' },
-    }) // luodaan vaiheet
+    })
+    console.log('savedPhases', savedPhases)
     const savedPhasesMap = new Map(
       savedPhases.map((phase) => [phase.name, phase._id]),
     )
-    const phaseIds = savedPhases.map((phase) => phase._id) // voidaan käyttää savedPhases suoraan
-
+    console.log('savedPhasesMap', savedPhasesMap) // muunnetaan nimi:id
+    const phaseIds = savedPhases.map((phase) => phase._id)
+    console.log('phaseIds', phaseIds) // muunnetaan id
     const updatedFields = field_definitions.map((field) => {
       return {
         ...field,
         phases: field.phases.map((name) => savedPhasesMap.get(name)),
       }
     })
+    console.log('updatedFields', updatedFields)
 
+    // luodaan field_definitions
     const savedFieldDefinitions = await FieldDefinition.insertMany(
       updatedFields,
       { writeConcern: { w: 'majority' } },
-    ) // luodaan määritelmät
+    )
+    console.log('savedFieldDefinitions', savedFieldDefinitions)
 
     const process = new Process({
       name: name,
@@ -120,7 +127,7 @@ processesRouter.delete('/:id', async (request, response, next) => {
 
     const process = await Process.findById(processId)
     if (!process) {
-      return res.status(404).json({ error: 'Process not found' })
+      return response.status(404).json({ error: 'Process not found' })
     }
 
     await Promise.all([
@@ -137,22 +144,178 @@ processesRouter.delete('/:id', async (request, response, next) => {
   }
 })
 
-processesRouter.put('/:id', (request, response, next) => {
-  const { name } = request.body
+processesRouter.put('/:id', async (request, response, next) => {
+  const processId = request.params.id
 
-  Process.findById(request.params.id)
-    .then((process) => {
-      if (!process) {
-        return response.status(404).end()
-      }
+  const { name, phases, field_definitions } = request.body
 
-      process.name = name
+  const process = await Process.findById(processId).populate('phases')
 
-      return process.save().then((updatedProcess) => {
-        response.json(updatedProcess)
-      })
+  if (!process)
+    return response.status(404).json({ message: 'Process not found' })
+
+  // validations
+  // name
+  if (!name || name.trim().length < 2) {
+    return response.status(400).json({
+      error: 'Processname is required and minumum length is 2 characters',
     })
-    .catch((error) => next(error))
+  }
+
+  try {
+    // check new phase
+    let newPhases = []
+    if (Array.isArray(phases)) {
+      newPhases = phases.filter((phase) => {
+        return typeof phase === 'object' && !phase?.id
+      })
+    }
+    // new phase
+    if (newPhases.length > 0) {
+      const savedPhases = await Phase.insertMany(newPhases, {
+        writeConcern: { w: 'majority' },
+      })
+
+      console.log('newPhases on DB ja nyt -> savedPhases', savedPhases)
+      const savedPhasesMap = new Map(
+        savedPhases.map((phase) => [phase.name, phase._id]),
+      )
+
+      if (savedPhases.length > 0) {
+        const processPhaseIdArray = phases.map((phase) => {
+          if (phase.id) return phase.id
+
+          return savedPhasesMap.get(phase.name)
+        })
+        process.phases = processPhaseIdArray
+        process.markModified('phases')
+        const savedProcess = await process.save()
+        await savedProcess.populate([
+          { path: 'phases', select: 'name' },
+          {
+            path: 'field_definitions',
+            select: 'name type options phases',
+            populate: {
+              path: 'phases',
+              select: 'name',
+            },
+          },
+        ])
+
+        return response.status(201).json(savedProcess)
+      }
+    }
+
+    // Check phase names
+    let hasChangedPhaseNames = false
+    for (const phase of phases) {
+      const fromDbPhase = process.phases.find((p) => p._id.equals(phase.id))
+      if (fromDbPhase && fromDbPhase.name !== phase.name) {
+        const updatedPhase = await Phase.findByIdAndUpdate(phase.id, {
+          name: phase.name,
+        })
+        console.log('updated phase: ', updatedPhase)
+        hasChangedPhaseNames = true
+      }
+    }
+
+    // Update phase names
+    if (hasChangedPhaseNames) {
+      console.log('update phase names')
+      const withChangedNames =
+        await Process.findById(processId).populate('phases')
+      await withChangedNames.populate([
+        { path: 'phases', select: 'name' },
+        {
+          path: 'field_definitions',
+          select: 'name type options phases',
+          populate: {
+            path: 'phases',
+            select: 'name',
+          },
+        },
+      ])
+      return response.status(201).json(withChangedNames)
+    }
+
+    // process.phases
+    const processPhaseIds = phases.map((phase) => phase.id) // vaiheet ok
+
+    const processPhaseIdsMap = new Map(
+      phases.map((phase) => {
+        return [phase.name, phase.id]
+      }),
+    )
+
+    const updatedFields = field_definitions.map((field, i) => {
+      return {
+        ...field, // name, options
+        phases: field.phases.map((phase) => {
+          console.log('phase from form:', phase)
+          if (typeof phase === 'object')
+            return processPhaseIdsMap.get(phase.name)
+          return processPhaseIdsMap.get(phase) // phases:['name'] -> phases:[id]
+        }),
+      }
+    })
+
+    // handle old definition
+    const fieldsWithId = updatedFields.filter((f) => f.id)
+
+    for (const field of fieldsWithId) {
+      await FieldDefinition.findByIdAndUpdate(field.id, field)
+    }
+
+    // handle new field defintion
+    const fieldsWithNoId = updatedFields.filter((f) => !f?.id)
+
+    const savedFieldDefinitions = await FieldDefinition.insertMany(
+      fieldsWithNoId,
+      { writeConcern: { w: 'majority' } },
+    )
+
+    // update record.fields
+    if (savedFieldDefinitions) {
+      const records = await Record.find({ process: processId })
+      for (const record of records) {
+        for (const def of savedFieldDefinitions) {
+          record.fields.push({
+            field_definition: def._id,
+            value: '',
+          })
+        }
+        record.markModified('fields')
+        await record.save()
+      }
+    }
+
+    process.name = name
+    process.phases = processPhaseIds
+    process.field_definitions = [
+      ...fieldsWithId.map((f) => f.id),
+      ...savedFieldDefinitions.map((f) => f.id),
+    ]
+
+    try {
+      const savedProcess = await process.save()
+      await savedProcess.populate([
+        { path: 'phases', select: 'name' },
+        {
+          path: 'field_definitions',
+          select: 'name type options phases',
+          populate: {
+            path: 'phases',
+            select: 'name',
+          },
+        },
+      ])
+      response.status(201).json(savedProcess)
+    } catch (error) {
+      next(error)
+    }
+  } catch (error) {
+    next(error)
+  }
 })
 
 module.exports = processesRouter

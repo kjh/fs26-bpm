@@ -1,50 +1,36 @@
 const mongoose = require('mongoose')
 
-const processSchema = new mongoose.Schema({
-  name: {
-    type: String,
-    required: true,
-    minlength: 5,
-  },
-
-  phases: [
-    {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'Phase',
+const processSchema = new mongoose.Schema(
+  {
+    name: {
+      type: String,
+      required: true,
+      minlength: 2,
     },
-  ],
 
-  field_definitions: [
-    {
+    phases: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Phase',
+      },
+    ],
+
+    field_definitions: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'FieldDefinition',
+      },
+    ],
+
+    user: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'FieldDefinition',
+      ref: 'User',
     },
-    /*{
-      type: {
-        type: String,
-        required: true
-      },
-      name: {
-        type: String,
-        required: true
-      },
-      options: [
-        { type: String } 
-      ],
-      phases: [
-        {
-          type: mongoose.Schema.Types.ObjectId,
-          ref: 'Phase'
-        }
-      ]
-    }*/
-  ],
-
-  user: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
   },
-})
+  {
+    timestamps: true,
+  },
+)
 
 processSchema.set('toJSON', {
   transform: (document, returnedObject) => {
