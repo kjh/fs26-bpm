@@ -201,7 +201,6 @@ const App = () => {
     }
   }, [process])
 
-
   if (!user) {
     return (
       <div>
