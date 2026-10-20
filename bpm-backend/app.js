@@ -30,7 +30,7 @@ app.use('/api/processes', processesRouter)
 app.use('/api/processes/:processId/records', recordsRouter)
 app.use('/api/users', usersRouter)
 app.use('/api/login', loginRouter)
-app.get('*', (req, res) => {
+app.get('*catchall', (req, res) => {
   res.sendFile(path.join(__dirname, 'dist', 'index.html'))
 })
 app.use(middleware.unknownEndpoint)
