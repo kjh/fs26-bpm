@@ -7,6 +7,7 @@ const processesRouter = require('./controllers/processes')
 const usersRouter = require('./controllers/users')
 const loginRouter = require('./controllers/login')
 const middleware = require('./utils/middleware')
+const path = require('path')
 
 const app = express()
 
@@ -29,7 +30,9 @@ app.use('/api/processes', processesRouter)
 app.use('/api/processes/:processId/records', recordsRouter)
 app.use('/api/users', usersRouter)
 app.use('/api/login', loginRouter)
-
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'dist', 'index.html'))
+})
 app.use(middleware.unknownEndpoint)
 app.use(middleware.errorHandler)
 

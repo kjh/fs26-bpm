@@ -8,6 +8,7 @@ const fieldDefinitionSchema = new mongoose.Schema({
   name: {
     type: String,
     required: true,
+    minlength: 1,
   },
   options: [{ type: String }],
   phases: [
