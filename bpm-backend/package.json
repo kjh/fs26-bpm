@@ -17,7 +17,9 @@
   "scripts": {
     "start": "NODE_ENV=production node index.js",
     "dev": "NODE_ENV=development node --watch index.js",
-    "test": "NODE_ENV=test node --test"
+    "test": "NODE_ENV=test node --test",
+    "build:ui": "rm -rf dist && cd ../bpm-frontend && npm run build && cp -r dist ../bpm-backend",
+    "deploy:full": "npm run build:ui && git add . && git commit -m uibuild && git push"
   },
   "dependencies": {
     "bcrypt": "^6.0.0",
