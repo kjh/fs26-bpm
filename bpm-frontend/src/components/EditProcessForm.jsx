@@ -806,7 +806,7 @@ const EditProcessFrom = ({ process, updateProcess, reloadProcess }) => {
                   }}
                   disabled={isAddFieldButtonDisabled}
                 >
-                  Add field (addNewFieldDefinition)
+                  Add field
                 </Button>
               ) : (
                 <Box>

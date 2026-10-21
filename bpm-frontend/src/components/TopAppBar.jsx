@@ -1,6 +1,7 @@
 import { AppBar, Toolbar, Box, Button, Container } from '@mui/material'
 import LogoutIcon from '@mui/icons-material/Logout'
 import AddIcon from '@mui/icons-material/Add'
+import KanbanIcon from '@mui/icons-material/Dashboard'
 import { Link as RouterLink } from 'react-router-dom'
 
 const TopAppBar = ({ user, handleLogout, handleAddNew, processId }) => {
@@ -23,13 +24,15 @@ const TopAppBar = ({ user, handleLogout, handleAddNew, processId }) => {
               Home
             </Button>
 
-            <Button
-              component={RouterLink}
-              to="/processes"
-              sx={{ color: '#fff', textTransform: 'none', fontWeight: 500 }}
-            >
-              Processes
-            </Button>
+            {!processId && (
+              <Button
+                component={RouterLink}
+                to="/processes"
+                sx={{ color: '#fff', textTransform: 'none', fontWeight: 500 }}
+              >
+                Processes
+              </Button>
+            )}
 
             {processId ? (
               <>
@@ -66,6 +69,7 @@ const TopAppBar = ({ user, handleLogout, handleAddNew, processId }) => {
                   to={`/processes/${processId}/records/kanban`}
                   variant="outlined"
                   color="secondary"
+                  startIcon={<KanbanIcon />}
                   sx={{
                     textTransform: 'none',
                     fontWeight: 500,

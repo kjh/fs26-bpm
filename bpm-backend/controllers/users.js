@@ -3,6 +3,11 @@ const usersRouter = require('express').Router()
 const User = require('../models/user')
 
 usersRouter.post('/', async (request, response) => {
+  // not allowed in production
+  if (process.env.NODE_ENV === 'production') {
+    return response.status(404).json({ error: 'not found' })
+  }
+
   const { username, name, password } = request.body
 
   const saltRounds = 10

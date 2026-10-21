@@ -8,7 +8,11 @@ const setToken = (newToken) => {
 }
 
 const getAll = async (processId) => {
-  const response = await axios.get(`${baseUrl}/${processId}/records`)
+  const config = {
+    headers: { Authorization: token },
+  }
+
+  const response = await axios.get(`${baseUrl}/${processId}/records`, config)
   return response.data
 }
 

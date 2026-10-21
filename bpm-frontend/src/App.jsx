@@ -67,7 +67,7 @@ const App = () => {
     }
 
     fetchProcesses()
-  }, [])
+  }, [user])
 
   const handleLogin = async (username, password) => {
     try {

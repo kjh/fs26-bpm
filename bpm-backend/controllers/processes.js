@@ -3,8 +3,19 @@ const Process = require('../models/process')
 const Phase = require('../models/phase')
 const Record = require('../models/record')
 const FieldDefinition = require('../models/fieldDefinition')
+const { userExtractor } = require('../utils/middleware')
 
-processesRouter.get('/', async (request, response) => {
+processesRouter.get('/', userExtractor, async (request, response) => {
+  const user = request.user
+
+  if (!request.token) {
+    return response.status(401).json({ error: 'token missing' })
+  }
+
+  if (!user) {
+    return response.status(400).json({ error: 'user not valid' })
+  }
+
   const processes = await Process.find({})
     .populate('phases', { name: 1 })
     .populate({
@@ -21,7 +32,7 @@ processesRouter.get('/', async (request, response) => {
   response.json(processes)
 })
 
-processesRouter.get('/:id', async (request, response, next) => {
+processesRouter.get('/:id', userExtractor, async (request, response, next) => {
   try {
     const process = await Process.findById(request.params.id)
       .populate('phases', { name: 1 })
@@ -45,7 +56,7 @@ processesRouter.get('/:id', async (request, response, next) => {
   }
 })
 
-processesRouter.post('/', async (request, response, next) => {
+processesRouter.post('/', userExtractor, async (request, response, next) => {
   const { name, phases, field_definitions } = request.body
 
   if (!name || name.trim().length < 2) {
@@ -121,30 +132,34 @@ processesRouter.post('/', async (request, response, next) => {
   }
 })
 
-processesRouter.delete('/:id', async (request, response, next) => {
-  try {
-    const processId = request.params.id
+processesRouter.delete(
+  '/:id',
+  userExtractor,
+  async (request, response, next) => {
+    try {
+      const processId = request.params.id
 
-    const process = await Process.findById(processId)
-    if (!process) {
-      return response.status(404).json({ error: 'Process not found' })
+      const process = await Process.findById(processId)
+      if (!process) {
+        return response.status(404).json({ error: 'Process not found' })
+      }
+
+      await Promise.all([
+        Phase.deleteMany({ _id: { $in: process.phases } }),
+        FieldDefinition.deleteMany({ _id: { $in: process.field_definitions } }),
+        Record.deleteMany({ process: processId }),
+      ])
+
+      await Process.findByIdAndDelete(processId)
+
+      response.status(204).end()
+    } catch (error) {
+      next(error)
     }
+  },
+)
 
-    await Promise.all([
-      Phase.deleteMany({ _id: { $in: process.phases } }),
-      FieldDefinition.deleteMany({ _id: { $in: process.field_definitions } }),
-      Record.deleteMany({ process: processId }),
-    ])
-
-    await Process.findByIdAndDelete(processId)
-
-    response.status(204).end()
-  } catch (error) {
-    next(error)
-  }
-})
-
-processesRouter.put('/:id', async (request, response, next) => {
+processesRouter.put('/:id', userExtractor, async (request, response, next) => {
   const processId = request.params.id
 
   const { name, phases, field_definitions } = request.body

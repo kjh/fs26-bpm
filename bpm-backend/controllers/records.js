@@ -1,8 +1,19 @@
 const recordsRouter = require('express').Router({ mergeParams: true })
 const Process = require('../models/process')
 const Record = require('../models/record')
+const { userExtractor } = require('../utils/middleware')
 
-recordsRouter.put('/:id', async (request, response, next) => {
+recordsRouter.put('/:id', userExtractor, async (request, response, next) => {
+  const user = request.user
+
+  if (!request.token) {
+    return response.status(401).json({ error: 'token missing' })
+  }
+
+  if (!user) {
+    return response.status(400).json({ error: 'user not valid' })
+  }
+
   try {
     const recordId = request.params.id
     const updatedFields = request.body?.fields
@@ -78,7 +89,17 @@ recordsRouter.put('/:id', async (request, response, next) => {
   }
 })
 
-recordsRouter.post('/', async (request, response, next) => {
+recordsRouter.post('/', userExtractor, async (request, response, next) => {
+  const user = request.user
+
+  if (!request.token) {
+    return response.status(401).json({ error: 'token missing' })
+  }
+
+  if (!user) {
+    return response.status(400).json({ error: 'user not valid' })
+  }
+
   try {
     const { processId } = request.params
 
@@ -117,7 +138,17 @@ recordsRouter.post('/', async (request, response, next) => {
   }
 })
 
-recordsRouter.get('/', async (request, response, next) => {
+recordsRouter.get('/', userExtractor, async (request, response, next) => {
+  const user = request.user
+
+  if (!request.token) {
+    return response.status(401).json({ error: 'token missing' })
+  }
+
+  if (!user) {
+    return response.status(400).json({ error: 'user not valid' })
+  }
+
   const { processId } = request.params
   try {
     const records = await Record.find({ process: processId })
@@ -137,7 +168,17 @@ recordsRouter.get('/', async (request, response, next) => {
   }
 })
 
-recordsRouter.delete('/:id', async (request, response, next) => {
+recordsRouter.delete('/:id', userExtractor, async (request, response, next) => {
+  const user = request.user
+
+  if (!request.token) {
+    return response.status(401).json({ error: 'token missing' })
+  }
+
+  if (!user) {
+    return response.status(400).json({ error: 'user not valid' })
+  }
+
   try {
     const recordId = request.params.id
 
