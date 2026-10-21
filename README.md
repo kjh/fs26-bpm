@@ -4,6 +4,11 @@ Sovellus toimii osoitteessa:
 
 https://fs26-bpm.onrender.com/
 
+## Käyttöohje
+
+Sovelluksen ohjeet [käyttöohjeesta (käyttöohje.md)](käyttöohje.md).
+
+
 ## Työn aihe:
 
 Liiketoimintaprosessien hallintatyökalu
@@ -27,6 +32,6 @@ Sovelluksen avulla voidaan rakentaa erilaisiin tarpeisiin mukautuva liiketoimint
 ## Generatiivisten kielimallien käyttö
 - Kielimalleja on käytetty oppimisen tukena (koska projektin tarkoitus on lisätä omaa osaamista)
 - Antamaan esimerkkejä esim. sivujen tyyyleistä (esim. mui-kirjaston komponenttien käytöstä)
-- Vihetilanteissa viestien merkitys ja debuggaukseen (miksi jokin asia ei toimi)
+- Virhetilanteissa viestien merkitys ja debuggaukseen (miksi jokin asia ei toimi)
 - Toimintojen rungon luominen jossain erityistapauksissa esim. drag & drop toiminnot
 - Käytetty Googlen gemini ja Microsoft Copilot -kielimalleja (ilmaisversiot) 
