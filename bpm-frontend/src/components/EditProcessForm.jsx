@@ -819,7 +819,7 @@ const EditProcessFrom = ({ process, updateProcess, reloadProcess }) => {
                     sx={{ m: 1 }}
                     disabled={isAddFieldButtonDisabled}
                   >
-                    Save changes (addNewFieldDefinition)
+                    Save changes
                   </Button>
                   <Button
                     type="button"
