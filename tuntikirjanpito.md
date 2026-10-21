@@ -74,4 +74,4 @@
 | 19.10 | 8    | material ui, prosessin muokkaus                                                                    |
 | 20.10 | 8    | material ui, prosessin muokkaus valmis, koko projektin viimeistelyä, sovellus internettiin         |
 | 21.10 | 3    | autentikointi kaikille reiteille, käyttäjän lisäys estetty tuotannossa, viimeistelyt ja käyttöohje |
-|  yht  | 215  |                                                                                                    |
+|  yht  | 218  |                                                                                                    |
